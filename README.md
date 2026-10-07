@@ -11,11 +11,12 @@ GitHub: [D41910](https://github.com/D41910) · 开源贡献主页：[github.com/
 
 ## 开源贡献
 
-向这些项目提交了修复真实缺陷的 PR，合计覆盖约 **41 万 star** 的 Agent 基础设施：
+向这些项目提交了修复真实缺陷的 PR，合计覆盖约 **57 万 star** 的 Agent 基础设施：
 
 | 项目 | Stars | 我的 PR |
 |---|---|---|
-| [browser-use](https://github.com/browser-use/browser-use) | 117k | [#6004](https://github.com/browser-use/browser-use/pull/6004) — 修复 DOM 提取时结尾换行产生零宽 chunk |
+| [Langflow](https://github.com/langflow-ai/langflow) | 156k | [#15632](https://github.com/langflow-ai/langflow/pull/15632) — 修复向量库按自定义 id 写入后删除静默命中 0 行 |
+| [browser-use](https://github.com/browser-use/browser-use) | 117k | [#6004](https://github.com/browser-use/browser-use/pull/6004) — 修复 DOM 提取时结尾换行产生零宽chunk |
 | [cline](https://github.com/cline/cline) | 70k | [#14803](https://github.com/cline/cline/pull/14803) — 修复 diff 生成时清空文件产生幻影行 |
 | [LiteLLM](https://github.com/BerriAI/litellm) | 60k | [#44365](https://github.com/BerriAI/litellm/pull/44365) — 修复嵌套 `metadata` JWT claim 不可达 |
 | | | [#44800](https://github.com/BerriAI/litellm/pull/44800) — 修复流式中途失败未触达 proxy 失败边界 |
@@ -29,6 +30,7 @@ GitHub: [D41910](https://github.com/D41910) · 开源贡献主页：[github.com/
 | [WeKnora](https://github.com/Tencent/WeKnora) | 32k | [#3996](https://github.com/Tencent/WeKnora/pull/3996) — 修复用户搜索在 SQLite(Lite) 上因 ILIKE 硬失败且未转义 LIKE 通配符 |
 | [instructor](https://github.com/567-labs/instructor) | 14k | [#2752](https://github.com/567-labs/instructor/pull/2752) — 修复 data URI 媒体类型未归一化导致图片静默降级为文本 |
 | [Semantic Kernel](https://github.com/microsoft/semantic-kernel) | 29k | [#14563](https://github.com/microsoft/semantic-kernel/pull/14563) — 修复上传路径未拒绝 `.`/`..` 路径段 |
+| [VoltAgent](https://github.com/VoltAgent/voltagent) | 11k | [#1441](https://github.com/VoltAgent/voltagent/pull/1441) — 修复脚手架生成的 Dockerfile 按包管理器渲染依赖层|
 
 ### 被拒绝的修复
 
@@ -71,6 +73,12 @@ GitHub: [D41910](https://github.com/D41910) · 开源贡献主页：[github.com/
 - **大小写与参数归一化漏一处** — 模块自己有归一化 helper，HTTP header 路径都走了，
   data URI 路径却直接比较原始字符串；`data:image/PNG;base64,...` 被判为非图片，
   而异常又被 `autodetect_safely` 吞掉降级成纯文本 —— **模型收到 base64 文本而非图片，无报错**。
+- **写入与读取的id 格式假设不一致** — `add_texts` 只对**自己生成**的 id 做哈希+大写，
+  调用方传入的 id 按原样存库（截到 `VARCHAR(100)`）；`delete` 却无条件重新大写并截到 16 位。
+  于是「按自定义 id 写入 → 按同一 id 删除」这条完全合法的路径，`WHERE id IN (...)`
+  一个都匹配不上，**DELETE 静默影响 0 行并返回 `None`**，
+  而 `VectorStore.delete` 的契约把 `None` 表达为「未实现」而非「删了 0 行」，
+  调用方无从察觉。差分模糊测试：851 个 id 形态，修复前600 个匹配不上存量值，修复后 0 个。
 
 ---
 
