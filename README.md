@@ -1,16 +1,93 @@
-## Hi there 👋
+# Hi, I'm D41910
 
-<!--
-**D41910/D41910** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
+**Java 后端出身，正在向 AI Agent 工程方向转型。**
 
-Here are some ideas to get you started:
+我做的事是**给高星的 Agent / LLM 开源项目提交真实、可验证的 PR**——不是写文档、不是加 demo，
+而是读源码、复现 bug、修掉它、并让测试证明这个 bug 以后不会再出现。
 
-- 🔭 I’m currently working on ...
-- 🌱 I’m currently learning ...
-- 👯 I’m looking to collaborate on ...
-- 🤔 I’m looking for help with ...
-- 💬 Ask me about ...
-- 📫 How to reach me: ...
-- 😄 Pronouns: ...
-- ⚡ Fun fact: ...
--->
+GitHub: [D41910](https://github.com/D41910) · 开源贡献主页：[github.com/D41910](https://github.com/D41910)
+
+---
+
+## 开源贡献
+
+向这些项目提交了修复真实缺陷的 PR，合计覆盖约 **38 万 star** 的 Agent 基础设施：
+
+| 项目 | Stars | 我的 PR |
+|---|---|---|
+| [browser-use](https://github.com/browser-use/browser-use) | 117k | [#6004](https://github.com/browser-use/browser-use/pull/6004) — 修复 DOM 提取时结尾换行产生零宽 chunk |
+| [cline](https://github.com/cline/cline) | 70k | [#14803](https://github.com/cline/cline/pull/14803) — 修复 diff 生成时清空文件产生幻影行 |
+| [LiteLLM](https://github.com/BerriAI/litellm) | 60k | [#44365](https://github.com/BerriAI/litellm/pull/44365) — 修复嵌套 `metadata` JWT claim 不可达 |
+| | | [#44800](https://github.com/BerriAI/litellm/pull/44800) — 修复流式中途失败未触达 proxy 失败边界 |
+| | | [#44801](https://github.com/BerriAI/litellm/pull/44801) — 修复 model 更新接口的授权顺序缺陷 |
+| | | [#44819](https://github.com/BerriAI/litellm/pull/44819) — 修复 image token 成本未计入 |
+| | | [#44826](https://github.com/BerriAI/litellm/pull/44826) — 修复 Langfuse OTel 观测输出映射 |
+| [crewAI](https://github.com/crewAIInc/crewAI) | 59k | [#7801](https://github.com/crewAIInc/crewAI/pull/7801) — 修复异步 task 取消时终态事件丢失 |
+| [AgentScope](https://github.com/agentscope-ai/agentscope) | 33k | [#2945](https://github.com/agentscope-ai/agentscope/pull/2945) — 修复写权限被当作八进制解析 |
+
+### 修的是什么类型的 bug
+
+ Mostly 真实用户会踩到的边界条件与并发缺陷：
+
+- **切片越界** — 结尾换行被 `split('\n')` 多算一个元素，产生 `char_start == char_end` 的零宽块，
+  分页时把越界起点传给模型，导致整轮编辑失败。
+- **哨兵值误判** — JWT 解析无条件剥离 `metadata.` 前缀，使真正嵌套的 claim 完全读不到，
+  静默错配到 default team。
+- **回调漏发** — proxy 管理的流在失败时只重抛、不记账，同步回调被绕过。
+- **事件竞态** — 取消与完成同时发生，terminal 事件先于 started 到达，span 永久泄漏。
+- **文件模式解析** — `644` 被 Python 当成八进制字面量，实际权限与预期不符。
+
+---
+
+## 我的工作方式
+
+提一个能真正被合并的 PR，和写一个看起来像 PR 的 PR，要求是不一样的。我的标准流程：
+
+1. **先读贡献规范** — 尤其是 `AGENTS.md`。LiteLLM 的 `AGENTS.md` 里有三条明文硬要求
+   （bug 修复必须扩展既有测试文件、测试必须真正走到被改的代码、禁止 monkeypatch 类属性），
+   `greptile-apps[bot]` 会逐条对照并写明 "This requirement must be satisfied before merging"。
+   提 PR 前不看，等于白提。
+
+2. **读真实调用链，不靠函数名猜** — 确认缺陷在生产路径上可达，触发条件是什么。
+   报错的 `traceback` 要能逐行对上源码行号。
+
+3. **回退实现证明测试有效** — 改完代码后，把修复回退，确认新测试**真实失败**；
+   再恢复修复，确认通过。一个在修复前也能通过的测试是装饰品，不是回归防护。
+
+4. **差分模糊测试防回归** — 在**未修复**的代码上采基线，再用几百个随机 / 边界输入跑修复版，
+   逐一对比输出。目标是「零个 case 出现非预期的语义变化」。
+   LiteLLM 那个 PR 是 4000 个随机输入，browser-use 是 1500 例。
+
+5. **只用真实测试结果** — 测试环境装不起来就如实写「未跑」，不会编造通过数。
+   反过来也会主动核对：某个测试在**未修改的 main 上是否同样失败**，
+   避免把环境性问题误报成自己的回归。
+
+6. **查抢跑** — 高星仓库的 issue 池被抢得极快（实测 E2B #1933 被 bot 几小时内抢跑、
+   agno 四个候选全被抢、smolagents 的 issue 平均有 3-25 个 PR 在抢）。
+   下单前必须用 `search/issues?q=...+is:pr+<issue号>+in:body` 逐号复核。
+   被抢跑就换目标，不硬挤。
+
+7. **查门禁机器人** — 这是最大的坑，已踩过 5 次：`langgraph` 的 `require_issue_link.yml`、
+   `pydantic-ai` 的 `pr-guard.yml`、`mastra` 的 triage 机器人、`agno` 的 `pr-triage.yml`、
+   `sst/opencode` 的 `compliance-close.yml`——**都会自动关掉未关联 issue 的外部 PR**。
+   更隐蔽的是：外部合并率异常高往往是假信号（langgraph 92%、pydantic-ai 99%，
+   恰恰因为外部 PR 过不了门禁，合进去的都是内部 PR）。
+
+8. **对评审意见逐条核实，不全盘接受** — 也会识别误报。LiteLLM 有一个评审意见
+   说 PR 新建了测试文件，实际是 `+101/-2` 的扩展（`test_sse_wrapper.py` 在 main 上已存在）。
+   核实后据实回复，维护者确认「这个是对的，我搞反了」。
+
+---
+
+## 技术栈
+
+- **语言**：Java（主力）、Python、TypeScript
+- **Agent 方向**：LLM 应用工程、多 Agent 编排、RAG、工具调用、Agent 可观测性
+- **基础设施**：SDK / 网关 / 代理层 / 前端 Agent 界面
+- **工具链**：pytest、vitest、ruff、flake8、GitHub API 自动化
+
+## 联系方式
+
+欢迎就上面任何一个 PR 里的问题交流——特别是如果你也踩过相同的坑，很想知道我有没有找错根因。
+
+[![GitHub](https://img.shields.io/badge/GitHub-D41910-181717?style=flat-square&logo=github)](https://github.com/D41910)
