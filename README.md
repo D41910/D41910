@@ -24,7 +24,7 @@ GitHub: [D41910](https://github.com/D41910) · 开源贡献主页：[github.com/
 | | | [#44826](https://github.com/BerriAI/litellm/pull/44826) — 修复 Langfuse OTel 观测输出映射 |
 | [crewAI](https://github.com/crewAIInc/crewAI) | 59k | [#7801](https://github.com/crewAIInc/crewAI/pull/7801) — 修复异步 task 取消时终态事件丢失 |
 | [AgentScope](https://github.com/agentscope-ai/agentscope) | 33k | [#2945](https://github.com/agentscope-ai/agentscope/pull/2945) — 修复写权限被当作八进制解析 |
-| [agent-framework](https://github.com/microsoft/agent-framework) | 14k | [#9137](https://github.com/microsoft/agent-framework/pull/9137) — 已被维护者关闭（见下方「被拒绝的修复」） |
+| [instructor](https://github.com/567-labs/instructor) | 14k | [#2752](https://github.com/567-labs/instructor/pull/2752) — 修复 data URI 媒体类型未归一化导致图片静默降级为文本 |
 | [Semantic Kernel](https://github.com/microsoft/semantic-kernel) | 29k | [#14563](https://github.com/microsoft/semantic-kernel/pull/14563) — 修复上传路径未拒绝 `.`/`..` 路径段 |
 
 ### 被拒绝的修复
@@ -65,6 +65,9 @@ GitHub: [D41910](https://github.com/D41910) · 开源贡献主页：[github.com/
 - **同一插件两个方向行为不一致** — `download_file` 三天前刚加上 `.`/`..` 路径段守卫，
   `upload_file` 却没加，模型可通过工具调用让文件写到沙箱根目录之外。
 - **路径穿越** — 模型可控的 `remote_file_path` 里 `.` / `..` 路径段原样透传出网。
+- **大小写与参数归一化漏一处** — 模块自己有归一化 helper，HTTP header 路径都走了，
+  data URI 路径却直接比较原始字符串；`data:image/PNG;base64,...` 被判为非图片，
+  而异常又被 `autodetect_safely` 吞掉降级成纯文本 —— **模型收到 base64 文本而非图片，无报错**。
 
 ---
 
