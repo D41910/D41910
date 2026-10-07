@@ -24,8 +24,29 @@ GitHub: [D41910](https://github.com/D41910) · 开源贡献主页：[github.com/
 | | | [#44826](https://github.com/BerriAI/litellm/pull/44826) — 修复 Langfuse OTel 观测输出映射 |
 | [crewAI](https://github.com/crewAIInc/crewAI) | 59k | [#7801](https://github.com/crewAIInc/crewAI/pull/7801) — 修复异步 task 取消时终态事件丢失 |
 | [AgentScope](https://github.com/agentscope-ai/agentscope) | 33k | [#2945](https://github.com/agentscope-ai/agentscope/pull/2945) — 修复写权限被当作八进制解析 |
-| [agent-framework](https://github.com/microsoft/agent-framework) | 14k | [#9137](https://github.com/microsoft/agent-framework/pull/9137) — 修复存储键字面值分支缺长度上界 |
+| [agent-framework](https://github.com/microsoft/agent-framework) | 14k | [#9137](https://github.com/microsoft/agent-framework/pull/9137) — 已被维护者关闭（见下方「被拒绝的修复」） |
 | [Semantic Kernel](https://github.com/microsoft/semantic-kernel) | 29k | [#14563](https://github.com/microsoft/semantic-kernel/pull/14563) — 修复上传路径未拒绝 `.`/`..` 路径段 |
+
+### 被拒绝的修复
+
+不是每个提上去的 PR 都站得住。记录被关闭的，比只记录成功的更有信息量：
+
+**agent-framework#9137** — 我给 `_storage_key_segment` 的 literal 分支补上了模块自己
+定义的 180 字符上限（base32 和 digest 分支一直遵守，只有 literal 漏了）。
+维护者 `eavanvalkenburg` 直接关闭，未留评论；issue #9136 被标 `not_planned`。
+真正的原因来自 Copilot 的评审意见，**指出了一个我漏掉的维度**：
+
+> 这会重映射此前合法的存储位置，让存量数据变得不可达。比如 181 字符的字面
+> session id 拼上 `.jsonl` 是 187 字节，在常见的 255 字节分量上限下完全合法，
+> 但现在所有读取都走 digest 路径，不再探测旧的 literal 路径。
+
+我的差分模糊测试把「181 字符从 literal 变成 digest」判成了预期变化——
+**因为基线取的是修复前的行为，而修复前的行为本身就是 bug 的一部分后果。**
+差分测试只能证明「与旧行为一致或不一致」，无法发现「旧行为该改」。
+凡是改动**持久化 key 或文件路径**的修复，必须单独做一遍存量数据影响分析。
+
+正确修法应该是 caller-aware 的上限：只重映射「加上调用方扩展名后此前根本
+不可能存在」的名字，而不是无差别套 180。
 
 ### 修的是什么类型的 bug
 
@@ -39,9 +60,11 @@ GitHub: [D41910](https://github.com/D41910) · 开源贡献主页：[github.com/
 - **事件竞态** — 取消与完成同时发生，terminal 事件先于 started 到达，span 永久泄漏。
 - **文件模式解析** — `644` 被 Python 当成八进制字面量，实际权限与预期不符。
 - **分支间防御漂移** — 模块自己定的 180 字符上限，base32 分支和 digest 分支都遵守了，
-  唯独 literal 分支漏掉，308 字符的 session id 拼上扩展名后撞上文件系统 255 字节上限。
+  唯独 literal 分支漏掉，308 字符的 session id 拼上扩展名后撞上文件系统 255 字节上限
+  （这个修复因为没做存量影响分析被关闭了，见上）。
 - **同一插件两个方向行为不一致** — `download_file` 三天前刚加上 `.`/`..` 路径段守卫，
   `upload_file` 却没加，模型可通过工具调用让文件写到沙箱根目录之外。
+- **路径穿越** — 模型可控的 `remote_file_path` 里 `.` / `..` 路径段原样透传出网。
 
 ---
 
