@@ -11,7 +11,7 @@ GitHub: [D41910](https://github.com/D41910) · 开源贡献主页：[github.com/
 
 ## 开源贡献
 
-向这些项目提交了修复真实缺陷的 PR，合计覆盖约 **40 万 star** 的 Agent 基础设施：
+向这些项目提交了修复真实缺陷的 PR，合计覆盖约 **41 万 star** 的 Agent 基础设施：
 
 | 项目 | Stars | 我的 PR |
 |---|---|---|
@@ -23,7 +23,10 @@ GitHub: [D41910](https://github.com/D41910) · 开源贡献主页：[github.com/
 | | | [#44819](https://github.com/BerriAI/litellm/pull/44819) — 修复 image token 成本未计入 |
 | | | [#44826](https://github.com/BerriAI/litellm/pull/44826) — 修复 Langfuse OTel 观测输出映射 |
 | [crewAI](https://github.com/crewAIInc/crewAI) | 59k | [#7801](https://github.com/crewAIInc/crewAI/pull/7801) — 修复异步 task 取消时终态事件丢失 |
+| | | [#7930](https://github.com/crewAIInc/crewAI/pull/7930) — 修复 Bedrock Converse 多模态内容未归并导致请求被拒 |
+| | | [#7932](https://github.com/crewAIInc/crewAI/pull/7932) — 修复 Anthropic / OpenAI Responses 多模态内容未归并导致请求被拒 |
 | [AgentScope](https://github.com/agentscope-ai/agentscope) | 33k | [#2945](https://github.com/agentscope-ai/agentscope/pull/2945) — 修复写权限被当作八进制解析 |
+| [WeKnora](https://github.com/Tencent/WeKnora) | 32k | [#3996](https://github.com/Tencent/WeKnora/pull/3996) — 修复用户搜索在 SQLite(Lite) 上因 ILIKE 硬失败且未转义 LIKE 通配符 |
 | [instructor](https://github.com/567-labs/instructor) | 14k | [#2752](https://github.com/567-labs/instructor/pull/2752) — 修复 data URI 媒体类型未归一化导致图片静默降级为文本 |
 | [Semantic Kernel](https://github.com/microsoft/semantic-kernel) | 29k | [#14563](https://github.com/microsoft/semantic-kernel/pull/14563) — 修复上传路径未拒绝 `.`/`..` 路径段 |
 
