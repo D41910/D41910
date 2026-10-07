@@ -11,7 +11,7 @@ GitHub: [D41910](https://github.com/D41910) · 开源贡献主页：[github.com/
 
 ## 开源贡献
 
-向这些项目提交了修复真实缺陷的 PR，合计覆盖约 **39 万 star** 的 Agent 基础设施：
+向这些项目提交了修复真实缺陷的 PR，合计覆盖约 **40 万 star** 的 Agent 基础设施：
 
 | 项目 | Stars | 我的 PR |
 |---|---|---|
@@ -25,6 +25,7 @@ GitHub: [D41910](https://github.com/D41910) · 开源贡献主页：[github.com/
 | [crewAI](https://github.com/crewAIInc/crewAI) | 59k | [#7801](https://github.com/crewAIInc/crewAI/pull/7801) — 修复异步 task 取消时终态事件丢失 |
 | [AgentScope](https://github.com/agentscope-ai/agentscope) | 33k | [#2945](https://github.com/agentscope-ai/agentscope/pull/2945) — 修复写权限被当作八进制解析 |
 | [agent-framework](https://github.com/microsoft/agent-framework) | 14k | [#9137](https://github.com/microsoft/agent-framework/pull/9137) — 修复存储键字面值分支缺长度上界 |
+| [Semantic Kernel](https://github.com/microsoft/semantic-kernel) | 29k | [#14563](https://github.com/microsoft/semantic-kernel/pull/14563) — 修复上传路径未拒绝 `.`/`..` 路径段 |
 
 ### 修的是什么类型的 bug
 
@@ -39,6 +40,8 @@ GitHub: [D41910](https://github.com/D41910) · 开源贡献主页：[github.com/
 - **文件模式解析** — `644` 被 Python 当成八进制字面量，实际权限与预期不符。
 - **分支间防御漂移** — 模块自己定的 180 字符上限，base32 分支和 digest 分支都遵守了，
   唯独 literal 分支漏掉，308 字符的 session id 拼上扩展名后撞上文件系统 255 字节上限。
+- **同一插件两个方向行为不一致** — `download_file` 三天前刚加上 `.`/`..` 路径段守卫，
+  `upload_file` 却没加，模型可通过工具调用让文件写到沙箱根目录之外。
 
 ---
 
