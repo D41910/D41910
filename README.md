@@ -56,6 +56,7 @@ AI reviewer 的每一条意见都要回去读代码，不能凭直觉判定误�
 | [AgentScope](https://github.com/agentscope-ai/agentscope) | 33k | [#2945](https://github.com/agentscope-ai/agentscope/pull/2945) — 修复写权限被当作八进制解析 |
 | [WeKnora](https://github.com/Tencent/WeKnora) | 32k | [#3996](https://github.com/Tencent/WeKnora/pull/3996) — 修复用户搜索在 SQLite(Lite) 上因 ILIKE 硬失败且未转义 LIKE 通配符 |
 | [gpt-researcher](https://github.com/assafelovic/gpt-researcher) | 30k | [#2199](https://github.com/assafelovic/gpt-researcher/pull/2199) — 修复图片生成开关因配置属性大小写不匹配而永久失效（且零日志） |
+| | | [#2200](https://github.com/assafelovic/gpt-researcher/pull/2200) — 修复在线文档加载器在 `metadata` 缺 `source` 时把 url 写成 `None`（缺 `metadata` 属性则整批加载中止） |
 | [instructor](https://github.com/567-labs/instructor) | 14k | [#2752](https://github.com/567-labs/instructor/pull/2752) — 修复 data URI 媒体类型未归一化导致图片静默降级为文本 |
 | [Semantic Kernel](https://github.com/microsoft/semantic-kernel) | 29k | [#14563](https://github.com/microsoft/semantic-kernel/pull/14563) — 修复上传路径未拒绝 `.`/`..` 路径段 |
 | [VoltAgent](https://github.com/VoltAgent/voltagent) | 11k | [#1441](https://github.com/VoltAgent/voltagent/pull/1441) — 修复脚手架生成的 Dockerfile 按包管理器渲染依赖层|
@@ -101,6 +102,14 @@ AI reviewer 的每一条意见都要回去读代码，不能凭直觉判定误�
 - **大小写与参数归一化漏一处** — 模块自己有归一化 helper，HTTP header 路径都走了，
   data URI 路径却直接比较原始字符串；`data:image/PNG;base64,...` 被判为非图片，
   而异常又被 `autodetect_safely` 吞掉降级成纯文本 —— **模型收到 base64 文本而非图片，无报错**。
+- **孪生实现的守卫漂移** — 同一个仓库里两份「加载文档 → `{"raw_content", "url"}`」的实现：
+  本地的 `DocumentLoader` 在 #2152 已合并的修复里加了守卫
+  （`getattr(page, "metadata", None) or {}` + `source or file_path or ""`，注释明写
+  「loaders 偶尔会漏掉 `metadata["source"]`」），而在线的 `OnlineDocumentLoader`
+  仍是裸读 `page.metadata.get("source")` —— 漏掉时 url 变成 `None`，
+  顺着 `SearchAPIRetriever` 原样进上下文，喂给模型的是 `Source: None`；
+  页对象连 `metadata` 属性都没有时抛 `AttributeError`，**整批文档一起丢**，
+  不限于出问题的那一页。差分 24 个变体：14 相同 / 10 变化 / 非预期 0。
 - **写入与读取的id 格式假设不一致** — `add_texts` 只对**自己生成**的 id 做哈希+大写，
   调用方传入的 id 按原样存库（截到 `VARCHAR(100)`）；`delete` 却无条件重新大写并截到 16 位。
   于是「按自定义 id 写入 → 按同一 id 删除」这条完全合法的路径，`WHERE id IN (...)`
