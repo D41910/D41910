@@ -60,6 +60,7 @@ AI reviewer 的每一条意见都要回去读代码，不能凭直觉判定误�
 | [instructor](https://github.com/567-labs/instructor) | 14k | [#2752](https://github.com/567-labs/instructor/pull/2752) — 修复 data URI 媒体类型未归一化导致图片静默降级为文本 |
 | [Semantic Kernel](https://github.com/microsoft/semantic-kernel) | 29k | [#14563](https://github.com/microsoft/semantic-kernel/pull/14563) — 修复上传路径未拒绝 `.`/`..` 路径段 |
 | [VoltAgent](https://github.com/VoltAgent/voltagent) | 11k | [#1441](https://github.com/VoltAgent/voltagent/pull/1441) — 修复脚手架生成的 Dockerfile 按包管理器渲染依赖层|
+| [PraisonAI](https://github.com/MervinPraison/PraisonAI) | 9k | [#5731](https://github.com/MervinPraison/PraisonAI/pull/5731) — 修复数组形式参数（如 `memory=["SQLITE"]`）未走预设名归一化而静默回落到默认后端 |
 
 ### 被拒绝的修复
 
@@ -110,6 +111,15 @@ AI reviewer 的每一条意见都要回去读代码，不能凭直觉判定误�
   顺着 `SearchAPIRetriever` 原样进上下文，喂给模型的是 `Source: None`；
   页对象连 `metadata` 属性都没有时抛 `AttributeError`，**整批文档一起丢**，
   不限于出问题的那一页。差分 24 个变体：14 相同 / 10 变化 / 非预期 0。
+- **同一套规则在兄弟分支里只漏一处** — `param_resolver` 为预设名定了一条拼写规则
+  （大小写、空白、`-`/`_` 通兑），字符串分支用 `strip().lower().replace("-","_")`
+  实现了，注释还写明「要与 `validate_preset_string` 的闭集校验接受同一批拼法」；
+  两个数组分支（`SINGLE_OR_LIST`、`PRESET_OVERRIDE`）却仍用裸 `in presets` 比较。
+  于是 `output="VERBOSE"` 能解析、`output=["VERBOSE"]` 抛
+  `Invalid output value: 'VERBOSE'. Did you mean 'verbose'?` —— **报错信息建议的正是它自己拒绝的值**；
+  更糟的是 `memory=["SQLITE"]` 不报错，裸比较未命中后直接落到 `config_class()`，
+  **静默返回默认的 `backend='file'` 而不是用户指定的 sqlite**。
+  1502 例差分模糊：1409 相同 / 93 变化，且 93 例逐一验证「与规范化拼法此前的既有行为一致」，非预期 0。
 - **写入与读取的id 格式假设不一致** — `add_texts` 只对**自己生成**的 id 做哈希+大写，
   调用方传入的 id 按原样存库（截到 `VARCHAR(100)`）；`delete` 却无条件重新大写并截到 16 位。
   于是「按自定义 id 写入 → 按同一 id 删除」这条完全合法的路径，`WHERE id IN (...)`
