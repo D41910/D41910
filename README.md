@@ -83,6 +83,7 @@ AI reviewer 的每一条意见都要回去读代码，不能凭直觉判定误�
 | [WeKnora](https://github.com/Tencent/WeKnora) | 32k | [#3996](https://github.com/Tencent/WeKnora/pull/3996) — 修复用户搜索在 SQLite(Lite) 上因 ILIKE 硬失败且未转义 LIKE 通配符 |
 | [gpt-researcher](https://github.com/assafelovic/gpt-researcher) | 30k | [#2199](https://github.com/assafelovic/gpt-researcher/pull/2199) — 修复图片生成开关因配置属性大小写不匹配而永久失效（且零日志） |
 | | | [#2200](https://github.com/assafelovic/gpt-researcher/pull/2200) — 修复在线文档加载器在 `metadata` 缺 `source` 时把 url 写成 `None`（缺 `metadata` 属性则整批加载中止） |
+| [FastGPT](https://github.com/labring/FastGPT) | 30k | [#7924](https://github.com/labring/FastGPT/pull/7924) — 修复判断器「包含 / 不包含」对 `any` 类型变量里的数字、布尔值恒返回 `false`，工作流静默走错分支 |
 | [instructor](https://github.com/567-labs/instructor) | 14k | [#2752](https://github.com/567-labs/instructor/pull/2752) — 修复 data URI 媒体类型未归一化导致图片静默降级为文本 |
 | [txtai](https://github.com/neuml/txtai) | 13k | [#1362](https://github.com/neuml/txtai/pull/1362) — 修复 `BashTool(allowed=[])` 被 `if allowed else` 吞掉，静默恢复 7 个默认命令 |
 | [Semantic Kernel](https://github.com/microsoft/semantic-kernel) | 29k | [#14563](https://github.com/microsoft/semantic-kernel/pull/14563) — 修复上传路径未拒绝 `.`/`..` 路径段 |
@@ -161,6 +162,22 @@ AI reviewer 的每一条意见都要回去读代码，不能凭直觉判定误�
   同仓库 5 个兄弟实现（hcd / cassandra / astradb_vectorstore / astradb_graph / oracle）
   的分支字符串都与各自下拉框一致，只有这一份漂了。差分：592 个无关输入 0 变化，
   98 个大小写/空白变体中仅目标两项命中 `mmr_traversal`。
+- **同一组兄弟条件里，只有两个没跟上仓库自己定下的契约** — FastGPT 判断器（if-else 节点）
+  的 `operations` 表里，`equalTo` / `notEqual` 早已 `String(x).trim()`，
+  #7870 给 `startWith` / `endWith` 引入了 `getInputText()` 并在注释里写明
+  「any 类型的变量也提供「开始为/结束为」，运行时可能拿到数字、布尔等非字符串值；
+  与 equalTo 一样先转成字符串」，#7903 又让 `reg` 复用同一个 helper。
+  但 `include` / `notInclude` 走的 `isInclude` 仍是
+  `typeof value === 'string'` 之外**一律 `return false`**。
+  而 `any` 类型用的 `allConditionList` 恰恰包含这两个条件，运行时拿到数字就成了：
+  「包含 `001`」对 `2001` → false，**「不包含 `001`」→ `!false` = true**。
+  两条都判反，工作流**静默走错分支且不报错**。
+  定位线索正是既有测试：`runIfElse.test.ts` 已经为 `startWith/endWith` 和 `reg`
+  各自断言了 `should ... a non-string value of an any-typed variable as text`，
+  **唯独没有 `include` / `notInclude` 的用例**——补上这对孪生用例就直接命中。
+  595 例差分模糊：560 相同 / 35 变化，**变化的输入类型分布 `{"number":28,"boolean":7}`，
+  非预期 0**；数组、字符串、`null`、`undefined`、对象、`Date`、`RegExp`、`Symbol`、`BigInt`
+  逐例不变。源码改动 +4/-2，零持久化影响。
 - **同一个 `__init__` 里两个参数，一个尊重显式假值、一个不尊重** — txtai 的
   `BashTool.__init__` 用 `allowed if allowed else DEFAULTS` 解析命令白名单，
   `[]` 是 falsy，于是**显式传空列表和压根没传无法区分**：
