@@ -11,6 +11,32 @@ GitHub: [D41910](https://github.com/D41910) · 开源贡献主页：[github.com/
 
 ## ✅ 已被合并的修复
 
+**[PraisonAI#5731](https://github.com/MervinPraison/PraisonAI/pull/5731) — 修复数组形式参数未走预设名归一化，静默回落默认后端**
+
+> `merged=true` · 2026-10-08 · +79/-4 于 2 个文件 · base `main`
+
+`param_resolver` 给预设名定了一条拼写规则（大小写、空白、`-`/`_` 通兑），
+字符串分支老老实实用 `strip().lower().replace("-", "_")` 实现了，注释还写明
+「要与 `validate_preset_string` 的闭集校验接受同一批拼法」；两个**数组**分支却仍是裸
+`in presets` 比较。于是 `output="VERBOSE"` 正常解析，`output=["VERBOSE"]` 抛
+`Invalid output value: 'VERBOSE'. Did you mean 'verbose'?`——**报错建议的正是它自己拒绝的值**；
+更糟的是 `memory=["SQLITE"]` 连错都不报，裸比较未命中后直接落到 `config_class()`，
+静默返回默认的 `backend='file'`。1502 例差分模糊：1409 相同 / 93 变化，
+93 条逐一验证「与规范化拼法此前的既有行为一致」，非预期 0。
+
+**[PraisonAI#5732](https://github.com/MervinPraison/PraisonAI/pull/5732) — 修复数组形式的 `memory` 缺 URL scheme 守卫，静默落到本地文件后端**
+
+> `merged=true` · 2026-10-08 · +34/-0 于 2 个文件 · base `main`
+
+`_resolve_string` 对不支持的 scheme 明写 `# Unknown scheme - raise helpful error` 并抛
+`Unsupported URL scheme 'redis' for memory`；数组分支的注释写「try as URL or return as-is」，
+**代码却 `return config_class()`**——注释与代码直接矛盾。于是
+`memory=["redis://localhost:6379/0"]` 静默得到本地文件后端，而 `memory="redis://..."` 正常报错。
+仓库自己的契约测试 `test_url_scheme_without_adapter_raises` 断言了这个不变量，
+**但只测了字符串形式**；`validate_memory_backend` 的报错原文也写着
+「Earlier releases accepted it and silently stored to a local file instead」——
+仓库已把「静默存到本地文件」定性为 bug。314 例差分：273 相同 / 41 变化，非预期 0。
+
 **[litellm#44800](https://github.com/BerriAI/litellm/pull/44800) — 修复 `/v1/messages` 流式中途失败未触达 proxy 失败边界**
 
 > `merged=true` · 合并人 `mateo-berri`（litellm 维护者） · 2026-10-08 ·
@@ -36,8 +62,8 @@ AI reviewer 的每一条意见都要回去读代码，不能凭直觉判定误�
 
 ## 开源贡献
 
-向这些项目提交了修复真实缺陷的 PR，合计覆盖约**60 万 star** 的 Agent 基础设施，
-其中 **1 个已合并进主干**：
+向这些项目提交了修复真实缺陷的 PR，合计覆盖约**63 万 star** 的 Agent 基础设施，
+其中 **3 个已合并进主干**：
 
 | 项目 | Stars | 我的 PR |
 |---|---|---|
@@ -58,10 +84,11 @@ AI reviewer 的每一条意见都要回去读代码，不能凭直觉判定误�
 | [gpt-researcher](https://github.com/assafelovic/gpt-researcher) | 30k | [#2199](https://github.com/assafelovic/gpt-researcher/pull/2199) — 修复图片生成开关因配置属性大小写不匹配而永久失效（且零日志） |
 | | | [#2200](https://github.com/assafelovic/gpt-researcher/pull/2200) — 修复在线文档加载器在 `metadata` 缺 `source` 时把 url 写成 `None`（缺 `metadata` 属性则整批加载中止） |
 | [instructor](https://github.com/567-labs/instructor) | 14k | [#2752](https://github.com/567-labs/instructor/pull/2752) — 修复 data URI 媒体类型未归一化导致图片静默降级为文本 |
+| [txtai](https://github.com/neuml/txtai) | 13k | [#1362](https://github.com/neuml/txtai/pull/1362) — 修复 `BashTool(allowed=[])` 被 `if allowed else` 吞掉，静默恢复 7 个默认命令 |
 | [Semantic Kernel](https://github.com/microsoft/semantic-kernel) | 29k | [#14563](https://github.com/microsoft/semantic-kernel/pull/14563) — 修复上传路径未拒绝 `.`/`..` 路径段 |
 | [VoltAgent](https://github.com/VoltAgent/voltagent) | 11k | [#1441](https://github.com/VoltAgent/voltagent/pull/1441) — 修复脚手架生成的 Dockerfile 按包管理器渲染依赖层|
-| [PraisonAI](https://github.com/MervinPraison/PraisonAI) | 9k | [#5731](https://github.com/MervinPraison/PraisonAI/pull/5731) — 修复数组形式参数（如 `memory=["SQLITE"]`）未走预设名归一化而静默回落到默认后端 |
-| | | [#5732](https://github.com/MervinPraison/PraisonAI/pull/5732) — 修复 `memory=["redis://..."]` 缺少不支持 URL scheme 的守卫，静默落到本地文件后端（字符串形式会正常报错） |
+| [PraisonAI](https://github.com/MervinPraison/PraisonAI) | 9k | [#5731](https://github.com/MervinPraison/PraisonAI/pull/5731) — ✅ **已合并** · 修复数组形式参数（如 `memory=["SQLITE"]`）未走预设名归一化而静默回落到默认后端 |
+| | | [#5732](https://github.com/MervinPraison/PraisonAI/pull/5732) — ✅ **已合并** · 修复 `memory=["redis://..."]` 缺少不支持 URL scheme 的守卫，静默落到本地文件后端（字符串形式会正常报错） |
 
 ### 被拒绝的修复
 
@@ -134,6 +161,16 @@ AI reviewer 的每一条意见都要回去读代码，不能凭直觉判定误�
   同仓库 5 个兄弟实现（hcd / cassandra / astradb_vectorstore / astradb_graph / oracle）
   的分支字符串都与各自下拉框一致，只有这一份漂了。差分：592 个无关输入 0 变化，
   98 个大小写/空白变体中仅目标两项命中 `mmr_traversal`。
+- **同一个 `__init__` 里两个参数，一个尊重显式假值、一个不尊重** — txtai 的
+  `BashTool.__init__` 用 `allowed if allowed else DEFAULTS` 解析命令白名单，
+  `[]` 是 falsy，于是**显式传空列表和压根没传无法区分**：
+  `BashTool(allowed=[])` 拿到的是 7 个默认命令，`cat` 真的执行。
+  而这个白名单的 docstring 自称「best effort **not a sandbox**」，
+  传空列表是表达「本 agent 不许跑 shell」的唯一方式——**一次静默的 opt-out 变 opt-in**。
+  最强证据在**同一个函数里**：兄弟参数 `timeout` 由 #1210 引入，原样存储，
+  既有测试就断言 `assertIsNone(BashTool(timeout=None).timeout)`。
+  1680 例差分（21 种 `allowed` × 4 种 timeout × 20 条命令）：1120 相同 / 560 变化，
+  **560 条全部是「显式 falsy 非 None 的 allowed」**，非预期 0。源码改动 +1/-1。
 
 ---
 
