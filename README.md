@@ -61,6 +61,7 @@ AI reviewer 的每一条意见都要回去读代码，不能凭直觉判定误�
 | [Semantic Kernel](https://github.com/microsoft/semantic-kernel) | 29k | [#14563](https://github.com/microsoft/semantic-kernel/pull/14563) — 修复上传路径未拒绝 `.`/`..` 路径段 |
 | [VoltAgent](https://github.com/VoltAgent/voltagent) | 11k | [#1441](https://github.com/VoltAgent/voltagent/pull/1441) — 修复脚手架生成的 Dockerfile 按包管理器渲染依赖层|
 | [PraisonAI](https://github.com/MervinPraison/PraisonAI) | 9k | [#5731](https://github.com/MervinPraison/PraisonAI/pull/5731) — 修复数组形式参数（如 `memory=["SQLITE"]`）未走预设名归一化而静默回落到默认后端 |
+| | | [#5732](https://github.com/MervinPraison/PraisonAI/pull/5732) — 修复 `memory=["redis://..."]` 缺少不支持 URL scheme 的守卫，静默落到本地文件后端（字符串形式会正常报错） |
 
 ### 被拒绝的修复
 
