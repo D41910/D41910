@@ -9,9 +9,35 @@ GitHub: [D41910](https://github.com/D41910) · 开源贡献主页：[github.com/
 
 ---
 
+## ✅ 已被合并的修复
+
+**[litellm#44800](https://github.com/BerriAI/litellm/pull/44800) — 修复 `/v1/messages` 流式中途失败未触达 proxy 失败边界**
+
+> `merged=true` · 合并人 `mateo-berri`（litellm 维护者） · 2026-10-08 ·
+> merge commit `87e961fa` · +649/-1 于 4 个文件 · Codecov「改动行全部被测试覆盖」
+
+Anthropic Messages 流式适配器在中途出错时，只更新了内部的 `litellm_logging`
+状态，就把异常吞掉了。后果是**上游已经失败，请求却继续往下流**，
+失败既不会进入 proxy 的失败边界，也不会触发失败回调——监控里看不到，
+重试逻辑不触发，日志里也没有。
+
+修复后失败会走通 `dispatch_failure_handlers(..., prefer_async_handlers=True)`，
+同步与异步两条回调路径都能收到。
+
+这个 PR 的评审过程值得单独记一笔：`greptile-apps[bot]` 最初报了一个
+「同步失败回调被漏发」的 P1，我当时判断是**误报**（它把「同步路径」
+当成了「同步 handler 列表」）。真正去读 `litellm_logging.py:3933-3936` 之后发现
+**bot 是对的、是我错了**——`async_failure_handler` 只读 `_async_failure_callback`，
+而同步列表由 `dispatch_failure_handlers` 单独调度。改完之后跑探针验证：
+修复前同步列表能触发、修复后也能触发。**这正是我之前给自己定的规则：
+AI reviewer 的每一条意见都要回去读代码，不能凭直觉判定误报。**
+
+---
+
 ## 开源贡献
 
-向这些项目提交了修复真实缺陷的 PR，合计覆盖约 **57 万 star** 的 Agent 基础设施：
+向这些项目提交了修复真实缺陷的 PR，合计覆盖约**57 万 star** 的 Agent 基础设施，
+其中 **1 个已合并进主干**：
 
 | 项目 | Stars | 我的 PR |
 |---|---|---|
@@ -20,7 +46,7 @@ GitHub: [D41910](https://github.com/D41910) · 开源贡献主页：[github.com/
 | [browser-use](https://github.com/browser-use/browser-use) | 117k | [#6004](https://github.com/browser-use/browser-use/pull/6004) — 修复 DOM 提取时结尾换行产生零宽chunk |
 | [cline](https://github.com/cline/cline) | 70k | [#14803](https://github.com/cline/cline/pull/14803) — 修复 diff 生成时清空文件产生幻影行 |
 | [LiteLLM](https://github.com/BerriAI/litellm) | 60k | [#44365](https://github.com/BerriAI/litellm/pull/44365) — 修复嵌套 `metadata` JWT claim 不可达 |
-| | | [#44800](https://github.com/BerriAI/litellm/pull/44800) — 修复流式中途失败未触达 proxy 失败边界 |
+| | | [#44800](https://github.com/BerriAI/litellm/pull/44800) — ✅ **已合并** · 修复流式中途失败未触达 proxy 失败边界 |
 | | | [#44801](https://github.com/BerriAI/litellm/pull/44801) — 修复 model 更新接口的授权顺序缺陷 |
 | | | [#44819](https://github.com/BerriAI/litellm/pull/44819) — 修复 image token 成本未计入 |
 | | | [#44826](https://github.com/BerriAI/litellm/pull/44826) — 修复 Langfuse OTel 观测输出映射 |
