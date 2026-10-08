@@ -16,6 +16,7 @@ GitHub: [D41910](https://github.com/D41910) · 开源贡献主页：[github.com/
 | 项目 | Stars | 我的 PR |
 |---|---|---|
 | [Langflow](https://github.com/langflow-ai/langflow) | 156k | [#15632](https://github.com/langflow-ai/langflow/pull/15632) — 修复向量库按自定义 id 写入后删除静默命中 0 行 |
+| | | [#15648](https://github.com/langflow-ai/langflow/pull/15648) — 修复「MMR traversal」搜索类型因大小写不匹配静默降级为普通 traversal |
 | [browser-use](https://github.com/browser-use/browser-use) | 117k | [#6004](https://github.com/browser-use/browser-use/pull/6004) — 修复 DOM 提取时结尾换行产生零宽chunk |
 | [cline](https://github.com/cline/cline) | 70k | [#14803](https://github.com/cline/cline/pull/14803) — 修复 diff 生成时清空文件产生幻影行 |
 | [LiteLLM](https://github.com/BerriAI/litellm) | 60k | [#44365](https://github.com/BerriAI/litellm/pull/44365) — 修复嵌套 `metadata` JWT claim 不可达 |
@@ -79,6 +80,13 @@ GitHub: [D41910](https://github.com/D41910) · 开源贡献主页：[github.com/
   一个都匹配不上，**DELETE 静默影响 0 行并返回 `None`**，
   而 `VectorStore.delete` 的契约把 `None` 表达为「未实现」而非「删了 0 行」，
   调用方无从察觉。差分模糊测试：851 个 id 形态，修复前600 个匹配不上存量值，修复后 0 个。
+- **UI 选项与分支条件的字符串漂移** — 下拉框提供的是 `"MMR traversal"`（小写 t），
+  `_map_search_type` 却拿 `"MMR Traversal"`（大写 T）去比，这个分支成为死代码，
+  选项静默落到兜底的普通 `traversal`：**界面显示 MMR、日志打印 MMR、实际跑的是非 MMR
+  的图遍历，全程无报错**；同一映射还被 `get_retriever_kwargs()` 复用，retriever 同样降级。
+  同仓库 5 个兄弟实现（hcd / cassandra / astradb_vectorstore / astradb_graph / oracle）
+  的分支字符串都与各自下拉框一致，只有这一份漂了。差分：592 个无关输入 0 变化，
+  98 个大小写/空白变体中仅目标两项命中 `mmr_traversal`。
 
 ---
 
