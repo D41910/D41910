@@ -81,6 +81,7 @@ AI reviewer 的每一条意见都要回去读代码，不能凭直觉判定误�
 | | | [#7932](https://github.com/crewAIInc/crewAI/pull/7932) — 修复 Anthropic / OpenAI Responses 多模态内容未归并导致请求被拒 |
 | [AgentScope](https://github.com/agentscope-ai/agentscope) | 33k | [#2945](https://github.com/agentscope-ai/agentscope/pull/2945) — 修复写权限被当作八进制解析 |
 | [DeepCode](https://github.com/HKUDS/DeepCode) | 17k | [#255](https://github.com/HKUDS/DeepCode/pull/255) — 修复破坏性命令筛查按字面 token 匹配程序名，`/bin/rm -rf /`、`/usr/bin/sudo reboot` 全部绕过 |
+| | | [#256](https://github.com/HKUDS/DeepCode/pull/256) — 修复 glob 把 `_SKIP_DIRS` 拿绝对路径分量去匹配：工作区路径里只要含 `build`/`dist`/`venv`/`node_modules`，全部文件被跳过、静默返回「No files matched.」，而共用同一常量的 grep 正常返回 |
 | [WeKnora](https://github.com/Tencent/WeKnora) | 32k | [#3996](https://github.com/Tencent/WeKnora/pull/3996) — 修复用户搜索在 SQLite(Lite) 上因 ILIKE 硬失败且未转义 LIKE 通配符 |
 | [gpt-researcher](https://github.com/assafelovic/gpt-researcher) | 30k | [#2199](https://github.com/assafelovic/gpt-researcher/pull/2199) — 修复图片生成开关因配置属性大小写不匹配而永久失效（且零日志） |
 | | | [#2200](https://github.com/assafelovic/gpt-researcher/pull/2200) — 修复在线文档加载器在 `metadata` 缺 `source` 时把 url 写成 `None`（缺 `metadata` 属性则整批加载中止） |
