@@ -95,6 +95,8 @@ AI reviewer 的每一条意见都要回去读代码，不能凭直觉判定误�
 | | | [#5732](https://github.com/MervinPraison/PraisonAI/pull/5732) — ✅ **已合并** · 修复 `memory=["redis://..."]` 缺少不支持 URL scheme 的守卫，静默落到本地文件后端（字符串形式会正常报错） |
 | [RubyLLM](https://github.com/crmne/ruby_llm) | 4.4k | [#1051](https://github.com/crmne/ruby_llm/pull/1051) — 修复 OpenAI 兼容 embedding 批结果从不读 `index`，乱序行按到达顺序配对、重复/负数/缺失位置全部被当成成功 |
 | | | [#1052](https://github.com/crmne/ruby_llm/pull/1052) — 修复 Mistral 批结果是五个 embedding 批方言里唯一既不校验也不按 `index` 排序的：乱序行把向量配给错误的输入，非法位置静默成功 |
+| [EvalScope](https://github.com/modelscope/evalscope) | 3.5k | [#1832](https://github.com/modelscope/evalscope/pull/1832) — 修复英文多选题解析器不接受全角逗号，`ANSWER: A，C` 只取到第一个选项，多选答案被静默判错 |
+| [Agent Framework](https://github.com/microsoft/agent-framework) | — | [#9137](https://github.com/microsoft/agent-framework/pull/9137) — ❌ **被关闭** · 见下方「被拒绝的修复」 |
 
 ### 被拒绝的修复
 
@@ -240,6 +242,18 @@ AI reviewer 的每一条意见都要回去读代码，不能凭直觉判定误�
   rejects a negative duration」——**同族参数修过，`distance` 漏了**。
   47 例差分（`undefined`/`NaN`/`±Infinity`/数字字符串/空白串/0/-0/小数/数组/对象/`MAX_SAFE_INTEGER`）：
   32 例结果相同、**新增接受 0 例、误拒 >=1 的值 0 例**。源码改动 +1/-1。
+- **同一个函数里，三条标签路径有两条认这个分隔符，第三条不认** — EvalScope 的多选题解析器
+  把模型输出里的选项标签分三条路读：括号式 `_BRACKETED_LABEL_RE`、中文式 `_PLAIN_LABEL_ZH_RE`、
+  英文裸式 `_PLAIN_LABEL_RE`。前两条的字符类里都有全角逗号 `，`，**只有英文裸式没有**
+  —— 于是 `ANSWER: (A，C)` 和 `答案：A，C` 都正常，`ANSWER: A，C` 却只捕获到 `'A'`，
+  **第二个选项被静默丢掉，多选答案判错**。
+  更强的证据是**同一个函数下文的注释与代码自相矛盾**：拆分前那行写着
+  「The label patterns also accept full-width separators」并做了 `.replace('，', ',')`，
+  但这个 pattern 根本不可能捕获到 `，` —— 那次归一化对这条路永远不生效。
+  而 #1751 修中文孪生 pattern 时的 commit 信息写的是「Mirror the English path」，
+  却把 `_PLAIN_LABEL_RE` 原样留在了上下文行里。
+  修复 = 补一个字符。7217 例差分：7016 例完全相同、**402 例变化且全部含 U+FF0C、非预期 0**，
+  201 例多选答案被找回。
 
 ---
 
