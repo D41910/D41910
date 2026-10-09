@@ -62,7 +62,7 @@ AI reviewer 的每一条意见都要回去读代码，不能凭直觉判定误�
 
 ## 开源贡献
 
-向这些项目提交了修复真实缺陷的 PR，合计覆盖约**112 万 star** 的 Agent 基础设施，
+向这些项目提交了修复真实缺陷的 PR，合计覆盖约**113 万 star** 的 Agent 基础设施，
 其中 **5 个已合并进主干**：
 
 | 项目 | Stars | 我的 PR |
@@ -93,6 +93,7 @@ AI reviewer 的每一条意见都要回去读代码，不能凭直觉判定误�
 | [mobile-mcp](https://github.com/mobile-next/mobile-mcp) | 8.8k | [#487](https://github.com/mobile-next/mobile-mcp/pull/487) — 修复滑动 `distance` 无下界，负值使三份Robot 实现全部反向滑动且仍报告成功 |
 | [PraisonAI](https://github.com/MervinPraison/PraisonAI) | 9k | [#5731](https://github.com/MervinPraison/PraisonAI/pull/5731) — ✅ **已合并** · 修复数组形式参数（如 `memory=["SQLITE"]`）未走预设名归一化而静默回落到默认后端 |
 | | | [#5732](https://github.com/MervinPraison/PraisonAI/pull/5732) — ✅ **已合并** · 修复 `memory=["redis://..."]` 缺少不支持 URL scheme 的守卫，静默落到本地文件后端（字符串形式会正常报错） |
+| [RubyLLM](https://github.com/crmne/ruby_llm) | 4.4k | [#1051](https://github.com/crmne/ruby_llm/pull/1051) — 修复 embedding 批结果从不读 `index`，乱序行按到达顺序配对、重复/负数/缺失位置全部被当成成功 |
 
 ### 被拒绝的修复
 
@@ -161,6 +162,18 @@ AI reviewer 的每一条意见都要回去读代码，不能凭直觉判定误�
   更糟的是 `memory=["SQLITE"]` 不报错，裸比较未命中后直接落到 `config_class()`，
   **静默返回默认的 `backend='file'` 而不是用户指定的 sqlite**。
   1502 例差分模糊：1409 相同 / 93 变化，且 93 例逐一验证「与规范化拼法此前的既有行为一致」，非预期 0。
+- **N 个兄弟实现里，只有一个把同一件事做全** — RubyLLM 的 batch 解析有四条路
+  （OpenAI 兼容 / Gemini / Bedrock / OpenRouter）。后三条都要求结果的 `index` 恰好覆盖
+  `0...N`，否则用各自既有的 `batch_failure` 把**这一条请求**标失败
+  （Gemini 是 #918，OpenRouter 是 #1000）。唯独 OpenAI 那条把 body 直接丢给
+  `parse_embedding_response`，而后者按 **wire 顺序** `map` `data` ——
+  **provider 明明在每一行里写了 `index`，这条路径从头到尾没读过它**。
+  于是乱序返回的行按到达顺序配对，重复 / 负数 / 缺失 / 非整数的 `index`
+  **全部被当成成功**，向量配错文本也不报错。
+  这是我在这仓库上**第 13 个候选**，前 12 个都被证伪；最后靠的不是「长得像漂移」，
+  而是「三个兄弟都做了而它没做」这件可验证的事实。
+  76 组 position × wire-order 组合的差分：合法位置只发生重排，
+  非法位置转为失败，**其余 0 变化**。
 - **写入与读取的id 格式假设不一致** — `add_texts` 只对**自己生成**的 id 做哈希+大写，
   调用方传入的 id 按原样存库（截到 `VARCHAR(100)`）；`delete` 却无条件重新大写并截到 16 位。
   于是「按自定义 id 写入 → 按同一 id 删除」这条完全合法的路径，`WHERE id IN (...)`
