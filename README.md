@@ -62,7 +62,7 @@ AI reviewer 的每一条意见都要回去读代码，不能凭直觉判定误�
 
 ## 开源贡献
 
-向这些项目提交了修复真实缺陷的 PR，合计覆盖约**86 万 star** 的 Agent 基础设施，
+向这些项目提交了修复真实缺陷的 PR，合计覆盖约**103 万 star** 的 Agent 基础设施，
 其中 **4 个已合并进主干**：
 
 | 项目 | Stars | 我的 PR |
@@ -80,6 +80,7 @@ AI reviewer 的每一条意见都要回去读代码，不能凭直觉判定误�
 | | | [#7930](https://github.com/crewAIInc/crewAI/pull/7930) — 修复 Bedrock Converse 多模态内容未归并导致请求被拒 |
 | | | [#7932](https://github.com/crewAIInc/crewAI/pull/7932) — 修复 Anthropic / OpenAI Responses 多模态内容未归并导致请求被拒 |
 | [AgentScope](https://github.com/agentscope-ai/agentscope) | 33k | [#2945](https://github.com/agentscope-ai/agentscope/pull/2945) — 修复写权限被当作八进制解析 |
+| [DeepCode](https://github.com/HKUDS/DeepCode) | 17k | [#255](https://github.com/HKUDS/DeepCode/pull/255) — 修复破坏性命令筛查按字面 token 匹配程序名，`/bin/rm -rf /`、`/usr/bin/sudo reboot` 全部绕过 |
 | [WeKnora](https://github.com/Tencent/WeKnora) | 32k | [#3996](https://github.com/Tencent/WeKnora/pull/3996) — 修复用户搜索在 SQLite(Lite) 上因 ILIKE 硬失败且未转义 LIKE 通配符 |
 | [gpt-researcher](https://github.com/assafelovic/gpt-researcher) | 30k | [#2199](https://github.com/assafelovic/gpt-researcher/pull/2199) — 修复图片生成开关因配置属性大小写不匹配而永久失效（且零日志） |
 | | | [#2200](https://github.com/assafelovic/gpt-researcher/pull/2200) — 修复在线文档加载器在 `metadata` 缺 `source` 时把 url 写成 `None`（缺 `metadata` 属性则整批加载中止） |
@@ -198,6 +199,19 @@ AI reviewer 的每一条意见都要回去读代码，不能凭直觉判定误�
   既有测试就断言 `assertIsNone(BashTool(timeout=None).timeout)`。
   1680 例差分（21 种 `allowed` × 4 种 timeout × 20 条命令）：1120 相同 / 560 变化，
   **560 条全部是「显式 falsy 非 None 的 allowed」**，非预期 0。源码改动 +1/-1。
+- **同一个模块里，三个筛查器有两个用了规范化函数，只有第三个没用** — DeepCode 的
+  破坏性命令筛查 `screen_command` 用 `tokens[0].lower()` **按字面 token 匹配程序名**，
+  而同文件的 `screen_egress`（第 467 行）和 `screen_install`（第 600、609 行）
+  都先经 `_program()` 归一——那个函数的 docstring 写的就是
+  「不带目录和 Windows 扩展名的裸程序名」。于是同一条命令**裸写被拦、带路径放过**：
+  `rm -rf /` 命中，`/bin/rm -rf /` 返回 `None`；`sudo reboot` 命中，
+  `/usr/bin/sudo reboot` 放过；`dd`/`mkfs`/`chmod` 同样全部绕过，
+  `ls | /usr/bin/rm -rf /` 这种分段场景也漏。
+  仓库自己的模块 docstring 写明存在的理由正是「诚实覆盖它**声称**能覆盖的」，
+  而修复方式就是调用**这个文件里已经写好的那个函数**——一行。
+  28200 例差分模糊（程序 × 多种 flag 拼法 × 路径 × shell 运算符 + 4000 条随机多段管道）：
+  **635 例新增拦截、0 例新增放行**，635 条逐一验证「确实含破坏性程序段」，非预期 0。
+  源码改动 +1/-1。
 
 ---
 
