@@ -62,8 +62,8 @@ AI reviewer 的每一条意见都要回去读代码，不能凭直觉判定误�
 
 ## 开源贡献
 
-向这些项目提交了修复真实缺陷的 PR，合计覆盖约**63 万 star** 的 Agent 基础设施，
-其中 **3 个已合并进主干**：
+向这些项目提交了修复真实缺陷的 PR，合计覆盖约**86 万 star** 的 Agent 基础设施，
+其中 **4 个已合并进主干**：
 
 | 项目 | Stars | 我的 PR |
 |---|---|---|
@@ -84,9 +84,10 @@ AI reviewer 的每一条意见都要回去读代码，不能凭直觉判定误�
 | [gpt-researcher](https://github.com/assafelovic/gpt-researcher) | 30k | [#2199](https://github.com/assafelovic/gpt-researcher/pull/2199) — 修复图片生成开关因配置属性大小写不匹配而永久失效（且零日志） |
 | | | [#2200](https://github.com/assafelovic/gpt-researcher/pull/2200) — 修复在线文档加载器在 `metadata` 缺 `source` 时把 url 写成 `None`（缺 `metadata` 属性则整批加载中止） |
 | [FastGPT](https://github.com/labring/FastGPT) | 30k | [#7924](https://github.com/labring/FastGPT/pull/7924) — 修复判断器「包含 / 不包含」对 `any` 类型变量里的数字、布尔值恒返回 `false`，工作流静默走错分支 |
+| [Semantic Kernel](https://github.com/microsoft/semantic-kernel) | 29k | [#14563](https://github.com/microsoft/semantic-kernel/pull/14563) — 修复上传路径未拒绝 `.`/`..` 路径段 |
 | [instructor](https://github.com/567-labs/instructor) | 14k | [#2752](https://github.com/567-labs/instructor/pull/2752) — 修复 data URI 媒体类型未归一化导致图片静默降级为文本 |
 | [txtai](https://github.com/neuml/txtai) | 13k | [#1362](https://github.com/neuml/txtai/pull/1362) — 修复 `BashTool(allowed=[])` 被 `if allowed else` 吞掉，静默恢复 7 个默认命令 |
-| [Semantic Kernel](https://github.com/microsoft/semantic-kernel) | 29k | [#14563](https://github.com/microsoft/semantic-kernel/pull/14563) — 修复上传路径未拒绝 `.`/`..` 路径段 |
+| [MaxKB](https://github.com/1Panel-dev/MaxKB) | 23k | [#7253](https://github.com/1Panel-dev/MaxKB/pull/7253) — 修复 token 用量按 `completion/prompt` 反向发布，嵌套子应用逐层复利式放大 |
 | [VoltAgent](https://github.com/VoltAgent/voltagent) | 11k | [#1441](https://github.com/VoltAgent/voltagent/pull/1441) — 修复脚手架生成的 Dockerfile 按包管理器渲染依赖层|
 | [PraisonAI](https://github.com/MervinPraison/PraisonAI) | 9k | [#5731](https://github.com/MervinPraison/PraisonAI/pull/5731) — ✅ **已合并** · 修复数组形式参数（如 `memory=["SQLITE"]`）未走预设名归一化而静默回落到默认后端 |
 | | | [#5732](https://github.com/MervinPraison/PraisonAI/pull/5732) — ✅ **已合并** · 修复 `memory=["redis://..."]` 缺少不支持 URL scheme 的守卫，静默落到本地文件后端（字符串形式会正常报错） |
@@ -129,6 +130,15 @@ AI reviewer 的每一条意见都要回去读代码，不能凭直觉判定误�
 - **同一插件两个方向行为不一致** — `download_file` 三天前刚加上 `.`/`..` 路径段守卫，
   `upload_file` 却没加，模型可通过工具调用让文件写到沙箱根目录之外。
 - **路径穿越** — 模型可控的 `remote_file_path` 里 `.` / `..` 路径段原样透传出网。
+- **抽象契约与实现的参数顺序漂移** — `BaseToResponse` 把两个 token 计数声明为
+  `(completion_tokens, prompt_tokens)`，而**所有调用点**传的都是
+  `(message_tokens, answer_tokens)`，也就是 `(prompt, completion)`。
+  位置参数不看名字，于是 `SystemToResponse` / `LoopToResponse` 把 prompt 数
+  发布成 `completion_tokens`，反之亦然；`OpenaiToResponse` 恰好把两个名字写反了，
+  **反而是唯一正确的那个**。真正让它变成 bug 而不是瑕疵的是往返：
+  父应用用 `usage.prompt_tokens` 回读子应用的 `message_tokens` 再原样传下去，
+  嵌套子应用每深一层，计数就再翻一次。
+  1830 例差分模糊确认唯一变化就是这三个字段的归属。
 - **大小写与参数归一化漏一处** — 模块自己有归一化 helper，HTTP header 路径都走了，
   data URI 路径却直接比较原始字符串；`data:image/PNG;base64,...` 被判为非图片，
   而异常又被 `autodetect_safely` 吞掉降级成纯文本 —— **模型收到 base64 文本而非图片，无报错**。
