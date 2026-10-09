@@ -62,8 +62,8 @@ AI reviewer 的每一条意见都要回去读代码，不能凭直觉判定误�
 
 ## 开源贡献
 
-向这些项目提交了修复真实缺陷的 PR，合计覆盖约**103 万 star** 的 Agent 基础设施，
-其中 **4 个已合并进主干**：
+向这些项目提交了修复真实缺陷的 PR，合计覆盖约**112 万 star** 的 Agent 基础设施，
+其中 **5 个已合并进主干**：
 
 | 项目 | Stars | 我的 PR |
 |---|---|---|
@@ -84,12 +84,13 @@ AI reviewer 的每一条意见都要回去读代码，不能凭直觉判定误�
 | [WeKnora](https://github.com/Tencent/WeKnora) | 32k | [#3996](https://github.com/Tencent/WeKnora/pull/3996) — 修复用户搜索在 SQLite(Lite) 上因 ILIKE 硬失败且未转义 LIKE 通配符 |
 | [gpt-researcher](https://github.com/assafelovic/gpt-researcher) | 30k | [#2199](https://github.com/assafelovic/gpt-researcher/pull/2199) — 修复图片生成开关因配置属性大小写不匹配而永久失效（且零日志） |
 | | | [#2200](https://github.com/assafelovic/gpt-researcher/pull/2200) — 修复在线文档加载器在 `metadata` 缺 `source` 时把 url 写成 `None`（缺 `metadata` 属性则整批加载中止） |
-| [FastGPT](https://github.com/labring/FastGPT) | 30k | [#7924](https://github.com/labring/FastGPT/pull/7924) — 修复判断器「包含 / 不包含」对 `any` 类型变量里的数字、布尔值恒返回 `false`，工作流静默走错分支 |
+| [FastGPT](https://github.com/labring/FastGPT) | 30k | [#7924](https://github.com/labring/FastGPT/pull/7924) — ✅ **已合并** · 修复判断器「包含 / 不包含」对 `any` 类型变量里的数字、布尔值恒返回 `false`，工作流静默走错分支 |
 | [Semantic Kernel](https://github.com/microsoft/semantic-kernel) | 29k | [#14563](https://github.com/microsoft/semantic-kernel/pull/14563) — 修复上传路径未拒绝 `.`/`..` 路径段 |
 | [instructor](https://github.com/567-labs/instructor) | 14k | [#2752](https://github.com/567-labs/instructor/pull/2752) — 修复 data URI 媒体类型未归一化导致图片静默降级为文本 |
 | [txtai](https://github.com/neuml/txtai) | 13k | [#1362](https://github.com/neuml/txtai/pull/1362) — 修复 `BashTool(allowed=[])` 被 `if allowed else` 吞掉，静默恢复 7 个默认命令 |
 | [MaxKB](https://github.com/1Panel-dev/MaxKB) | 23k | [#7253](https://github.com/1Panel-dev/MaxKB/pull/7253) — 修复 token 用量按 `completion/prompt` 反向发布，嵌套子应用逐层复利式放大 |
 | [VoltAgent](https://github.com/VoltAgent/voltagent) | 11k | [#1441](https://github.com/VoltAgent/voltagent/pull/1441) — 修复脚手架生成的 Dockerfile 按包管理器渲染依赖层|
+| [mobile-mcp](https://github.com/mobile-next/mobile-mcp) | 8.8k | [#487](https://github.com/mobile-next/mobile-mcp/pull/487) — 修复滑动 `distance` 无下界，负值使三份Robot 实现全部反向滑动且仍报告成功 |
 | [PraisonAI](https://github.com/MervinPraison/PraisonAI) | 9k | [#5731](https://github.com/MervinPraison/PraisonAI/pull/5731) — ✅ **已合并** · 修复数组形式参数（如 `memory=["SQLITE"]`）未走预设名归一化而静默回落到默认后端 |
 | | | [#5732](https://github.com/MervinPraison/PraisonAI/pull/5732) — ✅ **已合并** · 修复 `memory=["redis://..."]` 缺少不支持 URL scheme 的守卫，静默落到本地文件后端（字符串形式会正常报错） |
 
@@ -212,6 +213,19 @@ AI reviewer 的每一条意见都要回去读代码，不能凭直觉判定误�
   28200 例差分模糊（程序 × 多种 flag 拼法 × 路径 × shell 运算符 + 4000 条随机多段管道）：
   **635 例新增拦截、0 例新增放行**，635 条逐一验证「确实含破坏性程序段」，非预期 0。
   源码改动 +1/-1。
+- **一组兄弟数值参数都有下界，只有这一个漏了** — mobile-mcp 的 `mobile_swipe_on_screen`
+  里 `x`/`y` 是 `.min(0)`、同族的 `duration` 是 `.min(1).max(10000)`、
+  `angle` 是 `.min(0).max(180)`、`maxSize` 是 `.int().positive()`，
+  **只有 `distance` 是裸的 `z.coerce.number().optional()`**。
+  端点按 `起点 ± distance` 计算，符号一翻**滑动方向与请求完全相反**，
+  而工具仍返回 `Swiped up -400 pixels` —— **反向滑动且报告成功**，
+  对滚动类手势意味着「想上滑却下滚」。三份`Robot` 实现
+  （mobilecli / AndroidRobot / WebDriverAgent）**实测全部反转**；
+  `distance: 0` 也同样不一致（mobilecli `|| 400` 静默变 400px，iOS 默认参数只兜`undefined` 故为 0）。
+  仓库自己已把这类输入定性为 bug：CHANGELOG 1.0.7「`mobile_long_press_on_screen_at_coordinates`
+  rejects a negative duration」——**同族参数修过，`distance` 漏了**。
+  47 例差分（`undefined`/`NaN`/`±Infinity`/数字字符串/空白串/0/-0/小数/数组/对象/`MAX_SAFE_INTEGER`）：
+  32 例结果相同、**新增接受 0 例、误拒 >=1 的值 0 例**。源码改动 +1/-1。
 
 ---
 
