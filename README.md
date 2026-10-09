@@ -93,7 +93,8 @@ AI reviewer 的每一条意见都要回去读代码，不能凭直觉判定误�
 | [mobile-mcp](https://github.com/mobile-next/mobile-mcp) | 8.8k | [#487](https://github.com/mobile-next/mobile-mcp/pull/487) — 修复滑动 `distance` 无下界，负值使三份Robot 实现全部反向滑动且仍报告成功 |
 | [PraisonAI](https://github.com/MervinPraison/PraisonAI) | 9k | [#5731](https://github.com/MervinPraison/PraisonAI/pull/5731) — ✅ **已合并** · 修复数组形式参数（如 `memory=["SQLITE"]`）未走预设名归一化而静默回落到默认后端 |
 | | | [#5732](https://github.com/MervinPraison/PraisonAI/pull/5732) — ✅ **已合并** · 修复 `memory=["redis://..."]` 缺少不支持 URL scheme 的守卫，静默落到本地文件后端（字符串形式会正常报错） |
-| [RubyLLM](https://github.com/crmne/ruby_llm) | 4.4k | [#1051](https://github.com/crmne/ruby_llm/pull/1051) — 修复 embedding 批结果从不读 `index`，乱序行按到达顺序配对、重复/负数/缺失位置全部被当成成功 |
+| [RubyLLM](https://github.com/crmne/ruby_llm) | 4.4k | [#1051](https://github.com/crmne/ruby_llm/pull/1051) — 修复 OpenAI 兼容 embedding 批结果从不读 `index`，乱序行按到达顺序配对、重复/负数/缺失位置全部被当成成功 |
+| | | [#1052](https://github.com/crmne/ruby_llm/pull/1052) — 修复 Mistral 批结果是五个 embedding 批方言里唯一既不校验也不按 `index` 排序的：乱序行把向量配给错误的输入，非法位置静默成功 |
 
 ### 被拒绝的修复
 
