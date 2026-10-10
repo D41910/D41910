@@ -62,7 +62,7 @@ AI reviewer 的每一条意见都要回去读代码，不能凭直觉判定误�
 
 ## 开源贡献
 
-向这些项目提交了修复真实缺陷的 PR，合计覆盖约**118 万 star** 的 Agent 基础设施，
+向这些项目提交了修复真实缺陷的 PR，合计覆盖约**122 万 star** 的 Agent 基础设施，
 其中 **7 个已合并进主干**：
 
 | 项目 | Stars | 我的 PR |
@@ -96,6 +96,7 @@ AI reviewer 的每一条意见都要回去读代码，不能凭直觉判定误�
 | | | [#5732](https://github.com/MervinPraison/PraisonAI/pull/5732) — ✅ **已合并** · 修复 `memory=["redis://..."]` 缺少不支持 URL scheme 的守卫，静默落到本地文件后端（字符串形式会正常报错） |
 | [RubyLLM](https://github.com/crmne/ruby_llm) | 4.4k | [#1051](https://github.com/crmne/ruby_llm/pull/1051) — 修复 OpenAI 兼容 embedding 批结果从不读 `index`，乱序行按到达顺序配对、重复/负数/缺失位置全部被当成成功 |
 | | | [#1052](https://github.com/crmne/ruby_llm/pull/1052) — 修复 Mistral 批结果是五个 embedding 批方言里唯一既不校验也不按 `index` 排序的：乱序行把向量配给错误的输入，非法位置静默成功 |
+| [Langroid](https://github.com/langroid/langroid) | 4.1k | [#1215](https://github.com/langroid/langroid/pull/1215) — 修复流式响应的同步 / 异步孪生实现漂移：`finish_reason == "content_filter"` 的空响应转可见提示**只加在同步侧**（PR #660），异步侧没有→ 被内容过滤器拦截时返回空消息，`Task.run_async()` 判定为无响应并原样重发，进入 issue #658 报告的死循环 |
 | [GPUStack](https://github.com/gpustack/gpustack) | 5.8k | [#6391](https://github.com/gpustack/gpustack/pull/6391) — 修复缓存provider 目录的卡片 `icon` 未接入仓库已有的 `validate_icon` scheme 白名单（catalog / community backend 两个兄弟源都接了、各有一条测试点名）：`javascript:`、SVG `data:` URI、协议相对 URL 可被存库并由 `GET /v2/cache-providers` 原样下发给前端渲染 |
 | [EvalScope](https://github.com/modelscope/evalscope) | 3.5k | [#1832](https://github.com/modelscope/evalscope/pull/1832) — ✅ **已合并** · 修复英文多选题解析器不接受全角逗号，`ANSWER: A，C` 只取到第一个选项，多选答案被静默判错 |
 | | | [#1833](https://github.com/modelscope/evalscope/pull/1833) — ✅ **已合并** · 修复 markdown 链只给图片做本地路径绝对化、音频与视频两个分支没做：相对路径下发后无法与 base64 区分，`max_length`（`pretty_print` 默认 50）还会把真实路径截成不存在的字符串 |
@@ -139,6 +140,14 @@ AI reviewer 的每一条意见都要回去读代码，不能凭直觉判定误�
 - **同一插件两个方向行为不一致** — `download_file` 三天前刚加上 `.`/`..` 路径段守卫，
   `upload_file` 却没加，模型可通过工具调用让文件写到沙箱根目录之外。
 - **路径穿越** — 模型可控的 `remote_file_path` 里 `.` / `..` 路径段原样透传出网。
+- **同步 / 异步孪生实现的守卫漂移** — 流式响应的两个处理器是同一份逻辑的两份拷贝
+  （`_process_stream_event` 与 `_process_stream_event_async`），「内容被过滤器拦截时
+  转成可见提示」**只加在了同步那份**（PR #660 的 patch 只有一个 hunk）。
+  而 `stream` 默认开启、agent 走的正是异步那条路，于是被拦截时返回空消息，
+  `Task.run_async()` 判定为「无响应」并把上一条原样重发，拿到同样的拦截结果，
+  形成 issue #658 里描述的死循环。
+  判定它是遗漏而非设计取舍的依据很硬：**同文件另一次同类修复（#987 修 `null delta`）
+  两份都改了**（两个 hunk，+2/-2）。
 - **抽象契约与实现的参数顺序漂移** — `BaseToResponse` 把两个 token 计数声明为
   `(completion_tokens, prompt_tokens)`，而**所有调用点**传的都是
   `(message_tokens, answer_tokens)`，也就是 `(prompt, completion)`。
