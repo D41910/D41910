@@ -100,6 +100,7 @@ AI reviewer 的每一条意见都要回去读代码，不能凭直觉判定误�
 | [GPUStack](https://github.com/gpustack/gpustack) | 5.8k | [#6391](https://github.com/gpustack/gpustack/pull/6391) — 修复缓存provider 目录的卡片 `icon` 未接入仓库已有的 `validate_icon` scheme 白名单（catalog / community backend 两个兄弟源都接了、各有一条测试点名）：`javascript:`、SVG `data:` URI、协议相对 URL 可被存库并由 `GET /v2/cache-providers` 原样下发给前端渲染 |
 | [EvalScope](https://github.com/modelscope/evalscope) | 3.5k | [#1832](https://github.com/modelscope/evalscope/pull/1832) — ✅ **已合并** · 修复英文多选题解析器不接受全角逗号，`ANSWER: A，C` 只取到第一个选项，多选答案被静默判错 |
 | | | [#1833](https://github.com/modelscope/evalscope/pull/1833) — ✅ **已合并** · 修复 markdown 链只给图片做本地路径绝对化、音频与视频两个分支没做：相对路径下发后无法与 base64 区分，`max_length`（`pretty_print` 默认 50）还会把真实路径截成不存在的字符串 |
+| [SkillHub](https://github.com/iflytek/skillhub) | 5.2k | [#940](https://github.com/iflytek/skillhub/pull/940) — 修复创建命名空间表单的前端正则仍是纯 ASCII，而服务端 `SlugValidator` 自 PR #196 起已接受 Unicode 字母/数字/符号：中文、日文、韩文、emoji 命名的 slug 被前端拦下、请求根本发不出去（1026 例差分中 833 例被误拦），且报错文案与官方发布指南矛盾 · ⏳ 待补 DCO 签名与 CLA |
 | [Agent Framework](https://github.com/microsoft/agent-framework) | — | [#9137](https://github.com/microsoft/agent-framework/pull/9137) — ❌ **被关闭** · 见下方「被拒绝的修复」 |
 
 ### 被拒绝的修复
