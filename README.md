@@ -62,8 +62,8 @@ AI reviewer 的每一条意见都要回去读代码，不能凭直觉判定误�
 
 ## 开源贡献
 
-向这些项目提交了修复真实缺陷的 PR，覆盖 26 个仓库、合计约**81 万 star** 的 Agent 基础设施，
-其中 **7 个已合并进主干**：
+向这些项目提交了修复真实缺陷的 PR，覆盖 27 个仓库、合计约**89 万 star** 的 Agent 基础设施，
+其中 **18 个已合并进主干**：
 
 | 项目 | Stars | 我的 PR |
 |---|---|---|
@@ -96,22 +96,35 @@ AI reviewer 的每一条意见都要回去读代码，不能凭直觉判定误�
 | | | [#5732](https://github.com/MervinPraison/PraisonAI/pull/5732) — ✅ **已合并** · 修复 `memory=["redis://..."]` 缺少不支持 URL scheme 的守卫，静默落到本地文件后端（字符串形式会正常报错） |
 | [RubyLLM](https://github.com/crmne/ruby_llm) | 4.4k | [#1051](https://github.com/crmne/ruby_llm/pull/1051) — 修复 OpenAI 兼容 embedding 批结果从不读 `index`，乱序行按到达顺序配对、重复/负数/缺失位置全部被当成成功 |
 | | | [#1052](https://github.com/crmne/ruby_llm/pull/1052) — 修复 Mistral 批结果是五个 embedding 批方言里唯一既不校验也不按 `index` 排序的：乱序行把向量配给错误的输入，非法位置静默成功 |
-| [Langroid](https://github.com/langroid/langroid) | 4.1k | [#1215](https://github.com/langroid/langroid/pull/1215) — 修复流式响应的同步 / 异步孪生实现漂移：`finish_reason == "content_filter"` 的空响应转可见提示**只加在同步侧**（PR #660），异步侧没有→ 被内容过滤器拦截时返回空消息，`Task.run_async()` 判定为无响应并原样重发，进入 issue #658 报告的死循环 |
+| [Langroid](https://github.com/langroid/langroid) | 4.1k | [#1215](https://github.com/langroid/langroid/pull/1215) — ✅ **已合并** · 修复流式响应的同步 / 异步孪生实现漂移：`finish_reason == "content_filter"` 的空响应转可见提示**只加在同步侧**（PR #660），异步侧没有→ 被内容过滤器拦截时返回空消息，`Task.run_async()` 判定为无响应并原样重发，进入 issue #658 报告的死循环 |
 | [GPUStack](https://github.com/gpustack/gpustack) | 5.8k | [#6391](https://github.com/gpustack/gpustack/pull/6391) — 修复缓存provider 目录的卡片 `icon` 未接入仓库已有的 `validate_icon` scheme 白名单（catalog / community backend 两个兄弟源都接了、各有一条测试点名）：`javascript:`、SVG `data:` URI、协议相对 URL 可被存库并由 `GET /v2/cache-providers` 原样下发给前端渲染 |
 | [EvalScope](https://github.com/modelscope/evalscope) | 3.5k | [#1832](https://github.com/modelscope/evalscope/pull/1832) — ✅ **已合并** · 修复英文多选题解析器不接受全角逗号，`ANSWER: A，C` 只取到第一个选项，多选答案被静默判错 |
 | | | [#1833](https://github.com/modelscope/evalscope/pull/1833) — ✅ **已合并** · 修复 markdown 链只给图片做本地路径绝对化、音频与视频两个分支没做：相对路径下发后无法与 base64 区分，`max_length`（`pretty_print` 默认 50）还会把真实路径截成不存在的字符串 |
 | [SkillHub](https://github.com/iflytek/skillhub) | 5.2k | [#940](https://github.com/iflytek/skillhub/pull/940) — 修复创建命名空间表单的前端正则仍是纯 ASCII，而服务端 `SlugValidator` 自 PR #196 起已接受 Unicode 字母/数字/符号：中文、日文、韩文、emoji 命名的 slug 被前端拦下、请求根本发不出去（1026 例差分中 833 例被误拦），且报错文案与官方发布指南矛盾 · ⏳ 待补 DCO 签名与 CLA |
 | [OpenHarness](https://github.com/autonomous-ai/openharness) | 1.2k | [#1162](https://github.com/autonomous-ai/openharness/pull/1162) — 修复 Pi 面板读取器用**整个 capture（含 tmux scrollback）**匹配 picker 正则，而通用读取器早已收窄到「最新 prompt 之下」且同仓有测试点名该不变量：曾打开过一次 reasoning picker 的会话**永久 busy**，模型切换被 `AGENT_BUSY` 拒绝、团队投递被 `team_waiting_user` 拦住。关键证据是仓库自己抓的 pi pane证明**打开的 picker 会把输入框整个替换**——既有测试的夹具保留了输入框，是真实渲染从不出现的形态 |
 | | | [#1163](https://github.com/autonomous-ai/openharness/pull/1163) — 修复 Amp 审批读取器的 `stripAnsi` 匹配 CSI 参数时**漏掉引入它们的 ESC**，而面板来自 `capture-pane -e`（保留 SGR）：颜色处残留一个裸 ESC，`^\s*` 锚定的行正则看不见它 → **四选一的审批只剩三个选项，且缺的正是被高亮的那一项**（设备按序号作答，走到的行与 Amp 画出来的那一行不是同一行）。同时 `cat log[0m].txt` 这类**路径/通配符是内容不是样式**，会被吃掉变成 `cat log].txt`。**最硬证据：引入该正则的同一个commit（#926）就修过 hermes 的同一缺陷**，`lib/askQuestion.ts` 的注释明写「真实捕获里边框前面有 SGR码」 |
-| [Langroid](https://github.com/langroid/langroid) | 4.1k | [#1218](https://github.com/langroid/langroid/pull/1218) — 修复读取表格数据时不剥离 UTF-8 BOM，首列名多出`\ufeff` 导致该列永远匹配不上 |
-| | | [#1219](https://github.com/langroid/langroid/pull/1219) — 修复爬虫遇到 301/302 时仍按请求 URL 解析相对链接，落在重定向后的页面上全部失效 |
-| | | [#1220](https://github.com/langroid/langroid/pull/1220) — 修复 Markdown 标题层级跳级（h2→h4）时被逐级下调，文档大纲层级失真 |
-| | | [#1221](https://github.com/langroid/langroid/pull/1221) — 修复 Markdown 分块把 `overlap=0`（显式要求不重叠）当成未设置而回落到默认值 |
-| | | [#1222](https://github.com/langroid/langroid/pull/1222) — 修复模糊检索拼接上下文时按字符硬切，会把单词从中间截断，检索质量与可读性同时下降 |
+| [Langroid](https://github.com/langroid/langroid) | 4.1k | [#1218](https://github.com/langroid/langroid/pull/1218) — ✅ **已合并** · 修复读取表格数据时不剥离 UTF-8 BOM，首列名多出`\ufeff` 导致该列永远匹配不上 |
+| | | [#1219](https://github.com/langroid/langroid/pull/1219) — ❌ **已关闭（未合并）** · 修复爬虫遇到 301/302 时仍按请求 URL 解析相对链接，落在重定向后的页面上全部失效 |
+| | | [#1220](https://github.com/langroid/langroid/pull/1220) — ✅ **已合并** · 修复 Markdown 标题层级跳级（h2→h4）时被逐级下调，文档大纲层级失真 |
+| | | [#1221](https://github.com/langroid/langroid/pull/1221) — ✅ **已合并** · 修复 Markdown 分块把 `overlap=0`（显式要求不重叠）当成未设置而回落到默认值 |
+| | | [#1222](https://github.com/langroid/langroid/pull/1222) — ❌ **已关闭（未合并）** · 修复模糊检索拼接上下文时按字符硬切，会把单词从中间截断，检索质量与可读性同时下降 |
+| | | [#1223](https://github.com/langroid/langroid/pull/1223) — 修复加载表格数据时丢掉重名列 |
+| | | [#1224](https://github.com/langroid/langroid/pull/1224) — 修复 Markdown 分块丢掉段落开头的正文 |
+| | | [#1225](https://github.com/langroid/langroid/pull/1225) — 修复按行读取文档时丢掉行内空白 |
+| | | [#1226](https://github.com/langroid/langroid/pull/1226) — ✅ **已合并** · 修复 PDF 分页切分点被重复计入相邻两页 |
+| | | [#1227](https://github.com/langroid/langroid/pull/1227) — ✅ **已合并** · 修复显式配置的 embedding 组织参数被忽略 |
+| | | [#1228](https://github.com/langroid/langroid/pull/1228) — ✅ **已合并** · 修复 BPE 分块边界处丢字 |
+| | | [#1229](https://github.com/langroid/langroid/pull/1229) — ✅ **已合并** · 修复编号段落的续段被当成新段落切掉 |
+| | | [#1230](https://github.com/langroid/langroid/pull/1230) — ✅ **已合并** · 修复缺文档后端时抛出的错误不可操作（看不出要装哪个依赖） |
+| | | [#1231](https://github.com/langroid/langroid/pull/1231) — ✅ **已合并** · 修复删除不存在的 Redis key 报错，而非按幂等 no-op 处理 |
+| | | [#1232](https://github.com/langroid/langroid/pull/1232) — ✅ **已合并** · 修复 Agent 输出抽取不匹配字面量类型 |
+| | | [#1238](https://github.com/langroid/langroid/pull/1238) — 修复 `Parser.truncate_tokens` 不接受特殊 token 字面量 |
 | [Haystack](https://github.com/deepset-ai/haystack) | 23k | [#13206](https://github.com/deepset-ai/haystack/pull/13206) — 修复文档评估器不支持容器级 metadata，使「同一文档、不同容器」的评测结果无法区分 |
 | [AntOmniEvo](https://github.com/ant-research/AntOmniEvo) | 1.1k | [#20](https://github.com/ant-research/AntOmniEvo/pull/20) — 修复退化会话检测 `find_degenerate_ending` **只接进 Pi 一个后端**：它按 span 形态判断、本就与后端无关（模块自述 "shared across coding agent implementations"），而 `ClaudeCodeProposer` 直接返回未检查的 trajectory。网关过载时模型返回空 assistant 消息、CLI 内部重试后**exit 0**，result 事件仍是 `subtype=success`/`is_error=false`，于是 Phase 2 看不到 error、只看到工件目录变了 → **把半途而废的改动提升为候选**（正是已合并的 #5 想消除、#14 想阻止的那一幕） |
 | [FrontierAgent](https://github.com/ApodexAI/FrontierAgent) | 5.2k | [#66](https://github.com/ApodexAI/FrontierAgent/pull/66) — 修复 `bash` / `run_python_code` 的工具结果**第二道截断预算被硬编码**（4K / 5K），而第一道溢出门槛是可配置的 `TOOL_EXEC_RESULT_MAX_CHARS`（默认 8K，官方 A/B 文档实测取到 50000）：在**默认 8K 下** `run_python_code` 每一次溢出结果的「落盘路径 + 退出判定」就已被第二道截断抹掉；而调大该配置对 agent_team 毫无作用，因为多出来的额度会被原样砍回去。同仓库的 React 后处理器早已按「第二道必须跟随第一道」实现并写明理由（`_CONFIGURED_EXEC_TOOLS`），既有的 grep/glob 10K 条目注释与跨两个后处理器的参数化测试也都在论证这条不变量 —— 唯独这两个可配置的工具没跟上 |
 | [Agent Framework](https://github.com/microsoft/agent-framework) | — | [#9137](https://github.com/microsoft/agent-framework/pull/9137) — ❌ **被关闭** · 见下方「被拒绝的修复」 |
+| [DeerFlow](https://github.com/bytedance/deer-flow) | 84k | [#6694](https://github.com/bytedance/deer-flow/pull/6694) — 修复 You.com 搜索结果直接裸读 `data["results"]` 与 `sections[section]`：非对象顶层、非对象 `results`、非列表 section 会带着 `TypeError`/`AttributeError` 冲出工具边界，而不是返回该provider 家族既有的结构化格式错误（Brave #6550 / GroundRoute #6603 / Tavily #6645 都已这么做） |
+| | | [#6719](https://github.com/bytedance/deer-flow/pull/6719) — 修复 Sofya 的 `_response_results` 只实现了该家族「畸形载荷收容规则」三条里的两条：它会跳过非对象条目，但**非空列表里一个可用对象都没有时返回空列表**，于是 `web_search` / `web_fetch` 双双落到「No results found」——等于告诉模型这个查询本来就没匹配上，而不是暴露畸形响应。同名函数在 GroundRoute 里有第三条分支且注释写明理由；**#6603 的 commit message 更直接把 sofya 列为「已应用该规则」的成员之一** |
 
 ### 被拒绝的修复
 
