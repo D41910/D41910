@@ -62,7 +62,7 @@ AI reviewer 的每一条意见都要回去读代码，不能凭直觉判定误�
 
 ## 开源贡献
 
-向这些项目提交了修复真实缺陷的 PR，合计覆盖约**122 万 star** 的 Agent 基础设施，
+向这些项目提交了修复真实缺陷的 PR，覆盖 24 个仓库、合计约**76 万 star** 的 Agent 基础设施，
 其中 **7 个已合并进主干**：
 
 | 项目 | Stars | 我的 PR |
@@ -101,6 +101,13 @@ AI reviewer 的每一条意见都要回去读代码，不能凭直觉判定误�
 | [EvalScope](https://github.com/modelscope/evalscope) | 3.5k | [#1832](https://github.com/modelscope/evalscope/pull/1832) — ✅ **已合并** · 修复英文多选题解析器不接受全角逗号，`ANSWER: A，C` 只取到第一个选项，多选答案被静默判错 |
 | | | [#1833](https://github.com/modelscope/evalscope/pull/1833) — ✅ **已合并** · 修复 markdown 链只给图片做本地路径绝对化、音频与视频两个分支没做：相对路径下发后无法与 base64 区分，`max_length`（`pretty_print` 默认 50）还会把真实路径截成不存在的字符串 |
 | [SkillHub](https://github.com/iflytek/skillhub) | 5.2k | [#940](https://github.com/iflytek/skillhub/pull/940) — 修复创建命名空间表单的前端正则仍是纯 ASCII，而服务端 `SlugValidator` 自 PR #196 起已接受 Unicode 字母/数字/符号：中文、日文、韩文、emoji 命名的 slug 被前端拦下、请求根本发不出去（1026 例差分中 833 例被误拦），且报错文案与官方发布指南矛盾 · ⏳ 待补 DCO 签名与 CLA |
+| [OpenHarness](https://github.com/autonomous-ai/openharness) | 1.2k | [#1162](https://github.com/autonomous-ai/openharness/pull/1162) — 修复 Pi 面板读取器用**整个 capture（含 tmux scrollback）**匹配 picker 正则，而通用读取器早已收窄到「最新 prompt 之下」且同仓有测试点名该不变量：曾打开过一次 reasoning picker 的会话**永久 busy**，模型切换被 `AGENT_BUSY` 拒绝、团队投递被 `team_waiting_user` 拦住。关键证据是仓库自己抓的 pi pane证明**打开的 picker 会把输入框整个替换**——既有测试的夹具保留了输入框，是真实渲染从不出现的形态 |
+| [Langroid](https://github.com/langroid/langroid) | 4.1k | [#1218](https://github.com/langroid/langroid/pull/1218) — 修复读取表格数据时不剥离 UTF-8 BOM，首列名多出`\ufeff` 导致该列永远匹配不上 |
+| | | [#1219](https://github.com/langroid/langroid/pull/1219) — 修复爬虫遇到 301/302 时仍按请求 URL 解析相对链接，落在重定向后的页面上全部失效 |
+| | | [#1220](https://github.com/langroid/langroid/pull/1220) — 修复 Markdown 标题层级跳级（h2→h4）时被逐级下调，文档大纲层级失真 |
+| | | [#1221](https://github.com/langroid/langroid/pull/1221) — 修复 Markdown 分块把 `overlap=0`（显式要求不重叠）当成未设置而回落到默认值 |
+| | | [#1222](https://github.com/langroid/langroid/pull/1222) — 修复模糊检索拼接上下文时按字符硬切，会把单词从中间截断，检索质量与可读性同时下降 |
+| [Haystack](https://github.com/deepset-ai/haystack) | 23k | [#13206](https://github.com/deepset-ai/haystack/pull/13206) — 修复文档评估器不支持容器级 metadata，使「同一文档、不同容器」的评测结果无法区分 |
 | [Agent Framework](https://github.com/microsoft/agent-framework) | — | [#9137](https://github.com/microsoft/agent-framework/pull/9137) — ❌ **被关闭** · 见下方「被拒绝的修复」 |
 
 ### 被拒绝的修复
