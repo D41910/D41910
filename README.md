@@ -62,7 +62,7 @@ AI reviewer 的每一条意见都要回去读代码，不能凭直觉判定误�
 
 ## 开源贡献
 
-向这些项目提交了修复真实缺陷的 PR，覆盖 24 个仓库、合计约**76 万 star** 的 Agent 基础设施，
+向这些项目提交了修复真实缺陷的 PR，覆盖 25 个仓库、合计约**76 万 star** 的 Agent 基础设施，
 其中 **7 个已合并进主干**：
 
 | 项目 | Stars | 我的 PR |
@@ -109,6 +109,7 @@ AI reviewer 的每一条意见都要回去读代码，不能凭直觉判定误�
 | | | [#1221](https://github.com/langroid/langroid/pull/1221) — 修复 Markdown 分块把 `overlap=0`（显式要求不重叠）当成未设置而回落到默认值 |
 | | | [#1222](https://github.com/langroid/langroid/pull/1222) — 修复模糊检索拼接上下文时按字符硬切，会把单词从中间截断，检索质量与可读性同时下降 |
 | [Haystack](https://github.com/deepset-ai/haystack) | 23k | [#13206](https://github.com/deepset-ai/haystack/pull/13206) — 修复文档评估器不支持容器级 metadata，使「同一文档、不同容器」的评测结果无法区分 |
+| [AntOmniEvo](https://github.com/ant-research/AntOmniEvo) | 1.1k | [#20](https://github.com/ant-research/AntOmniEvo/pull/20) — 修复退化会话检测 `find_degenerate_ending` **只接进 Pi 一个后端**：它按 span 形态判断、本就与后端无关（模块自述 "shared across coding agent implementations"），而 `ClaudeCodeProposer` 直接返回未检查的 trajectory。网关过载时模型返回空 assistant 消息、CLI 内部重试后**exit 0**，result 事件仍是 `subtype=success`/`is_error=false`，于是 Phase 2 看不到 error、只看到工件目录变了 → **把半途而废的改动提升为候选**（正是已合并的 #5 想消除、#14 想阻止的那一幕） |
 | [Agent Framework](https://github.com/microsoft/agent-framework) | — | [#9137](https://github.com/microsoft/agent-framework/pull/9137) — ❌ **被关闭** · 见下方「被拒绝的修复」 |
 
 ### 被拒绝的修复
@@ -181,6 +182,23 @@ AI reviewer 的每一条意见都要回去读代码，不能凭直觉判定误�
   **23 个全部与那6 份共识不一致**；唯独 amp 的夹具被裁成了纯文本，所以测试永远碰不到。
   差分 155 例（33 个真实捕获 × 5 种 SGR 位置），以兄弟正则当oracle：
   修复前149 例不一致，修复后 0 例，**纠正 149 例、回归 0 例**。
+- **一个通用检测器只接进了一半的后端** — `find_degenerate_ending()` 所在模块自述
+  "Generic trajectory utilities **shared across coding agent implementations**"，
+  它判断的是 **span 形态**（`span_type == "model"`）而非任何特定后端的事件，
+  但全仓 `grep` 只有**一个调用点**：Pi 后端。`ClaudeCodeProposer.invoke_agent`
+  拿到解析结果直接返回，不做任何检查。
+  于是已合并的 #5 想消除的那个失败模式在 Claude 后端**依然可达**：网关过载时
+  模型返回空 assistant 消息，CLI 内部重试几次后 **exit 0**，
+  最后的 result 事件仍是 `subtype="success"` / `is_error=false`，
+  解析器自然什么也不记录 → Phase 2 看不到 error、只看到工件目录变了，
+  **把半途而废的改动提升为候选**，也就是 #14 明说要阻止的
+  "a half-finished mutation must not be rolled out as a candidate"。
+  判定依据是三条同源证据：① 模块自述与实现形态都表明它与后端无关；
+  ② `errors.py` 明写该分类 "is not Pi-specific"、#14 的提交信息写 "one rule to
+  **both backends**"；③ #5 的 `/files` 显示它只动了 `pi_coding_agent_proposer.py`。
+  修复 = 把已有的检测器接进另一个后端，7 行；用 `if not trajectory.errors` 兜底，
+  保证显式的 `is_error` / `error_*` 仍报自己的原因。
+  18 例差分：10 相同 / 8 新增拦截（全是退化形态）/ **回归 0**。
 - **大小写与参数归一化漏一处** — 模块自己有归一化 helper，HTTP header 路径都走了，
   data URI 路径却直接比较原始字符串；`data:image/PNG;base64,...` 被判为非图片，
   而异常又被 `autodetect_safely` 吞掉降级成纯文本 —— **模型收到 base64 文本而非图片，无报错**。
