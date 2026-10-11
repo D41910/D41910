@@ -62,7 +62,7 @@ AI reviewer 的每一条意见都要回去读代码，不能凭直觉判定误�
 
 ## 开源贡献
 
-向这些项目提交了修复真实缺陷的 PR，覆盖 25 个仓库、合计约**76 万 star** 的 Agent 基础设施，
+向这些项目提交了修复真实缺陷的 PR，覆盖 26 个仓库、合计约**81 万 star** 的 Agent 基础设施，
 其中 **7 个已合并进主干**：
 
 | 项目 | Stars | 我的 PR |
@@ -110,6 +110,7 @@ AI reviewer 的每一条意见都要回去读代码，不能凭直觉判定误�
 | | | [#1222](https://github.com/langroid/langroid/pull/1222) — 修复模糊检索拼接上下文时按字符硬切，会把单词从中间截断，检索质量与可读性同时下降 |
 | [Haystack](https://github.com/deepset-ai/haystack) | 23k | [#13206](https://github.com/deepset-ai/haystack/pull/13206) — 修复文档评估器不支持容器级 metadata，使「同一文档、不同容器」的评测结果无法区分 |
 | [AntOmniEvo](https://github.com/ant-research/AntOmniEvo) | 1.1k | [#20](https://github.com/ant-research/AntOmniEvo/pull/20) — 修复退化会话检测 `find_degenerate_ending` **只接进 Pi 一个后端**：它按 span 形态判断、本就与后端无关（模块自述 "shared across coding agent implementations"），而 `ClaudeCodeProposer` 直接返回未检查的 trajectory。网关过载时模型返回空 assistant 消息、CLI 内部重试后**exit 0**，result 事件仍是 `subtype=success`/`is_error=false`，于是 Phase 2 看不到 error、只看到工件目录变了 → **把半途而废的改动提升为候选**（正是已合并的 #5 想消除、#14 想阻止的那一幕） |
+| [FrontierAgent](https://github.com/ApodexAI/FrontierAgent) | 5.2k | [#66](https://github.com/ApodexAI/FrontierAgent/pull/66) — 修复 `bash` / `run_python_code` 的工具结果**第二道截断预算被硬编码**（4K / 5K），而第一道溢出门槛是可配置的 `TOOL_EXEC_RESULT_MAX_CHARS`（默认 8K，官方 A/B 文档实测取到 50000）：在**默认 8K 下** `run_python_code` 每一次溢出结果的「落盘路径 + 退出判定」就已被第二道截断抹掉；而调大该配置对 agent_team 毫无作用，因为多出来的额度会被原样砍回去。同仓库的 React 后处理器早已按「第二道必须跟随第一道」实现并写明理由（`_CONFIGURED_EXEC_TOOLS`），既有的 grep/glob 10K 条目注释与跨两个后处理器的参数化测试也都在论证这条不变量 —— 唯独这两个可配置的工具没跟上 |
 | [Agent Framework](https://github.com/microsoft/agent-framework) | — | [#9137](https://github.com/microsoft/agent-framework/pull/9137) — ❌ **被关闭** · 见下方「被拒绝的修复」 |
 
 ### 被拒绝的修复
@@ -308,6 +309,20 @@ AI reviewer 的每一条意见都要回去读代码，不能凭直觉判定误�
   却把 `_PLAIN_LABEL_RE` 原样留在了上下文行里。
   修复 = 补一个字符。7217 例差分：7016 例完全相同、**402 例变化且全部含 U+FF0C、非预期 0**，
   201 例多选答案被找回。
+- **两道串联的守卫，其中第二道忘了第一道是可配置的** — FrontierAgent 的工具结果要过两道截断：
+  第一道 `maybe_overflow` 溢落到磁盘、并在**结果尾部**附上「落盘路径」和「退出判定」；
+  第二道是后处理器按工具名查预算表再切一刀。第一道的上限是 `TOOL_EXEC_RESULT_MAX_CHARS`
+  （可配置，官方 A/B 文档实测从 8000 打到 50000），**但 `agent_team` 那张预算表把
+  `bash` / `run_python_code` 硬编码成 4K / 5K**。
+ 后果有两层，都用真实代码路径复现过：**默认 8K 下**，`run_python_code` 每一次溢出结果的
+  落盘路径和退出判定就已经被第二道抹掉（模型只看到一段没有线索的截断文本）；
+  而**把配置调大对 agent_team 完全无效** —— 第一道放宽到 50000，第二道照样砍回 4037 / 5116。
+  判定它是遗漏而非取舍的证据有三条：同仓库的 React 后处理器早已按这条规则实现，
+  并把理由写在代码注释里；同一张表里紧挨着的 grep/glob 条目注释明写
+  「the value react has carried for this reason all along」；而那个**跨两个后处理器参数化**的
+  回归测试，工具列表偏偏只覆盖了固定门槛的三个工具。
+  修复 = 照搬兄弟已有的规则。**2016 例差分：1891 例完全相同、125 例变化且全部限定在这两个工具、
+  非预期 0**；React 侧的输出在全部 2016 例里**逐字节未动**。
 
 ---
 
