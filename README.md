@@ -102,6 +102,7 @@ AI reviewer 的每一条意见都要回去读代码，不能凭直觉判定误�
 | | | [#1833](https://github.com/modelscope/evalscope/pull/1833) — ✅ **已合并** · 修复 markdown 链只给图片做本地路径绝对化、音频与视频两个分支没做：相对路径下发后无法与 base64 区分，`max_length`（`pretty_print` 默认 50）还会把真实路径截成不存在的字符串 |
 | [SkillHub](https://github.com/iflytek/skillhub) | 5.2k | [#940](https://github.com/iflytek/skillhub/pull/940) — 修复创建命名空间表单的前端正则仍是纯 ASCII，而服务端 `SlugValidator` 自 PR #196 起已接受 Unicode 字母/数字/符号：中文、日文、韩文、emoji 命名的 slug 被前端拦下、请求根本发不出去（1026 例差分中 833 例被误拦），且报错文案与官方发布指南矛盾 · ⏳ 待补 DCO 签名与 CLA |
 | [OpenHarness](https://github.com/autonomous-ai/openharness) | 1.2k | [#1162](https://github.com/autonomous-ai/openharness/pull/1162) — 修复 Pi 面板读取器用**整个 capture（含 tmux scrollback）**匹配 picker 正则，而通用读取器早已收窄到「最新 prompt 之下」且同仓有测试点名该不变量：曾打开过一次 reasoning picker 的会话**永久 busy**，模型切换被 `AGENT_BUSY` 拒绝、团队投递被 `team_waiting_user` 拦住。关键证据是仓库自己抓的 pi pane证明**打开的 picker 会把输入框整个替换**——既有测试的夹具保留了输入框，是真实渲染从不出现的形态 |
+| | | [#1163](https://github.com/autonomous-ai/openharness/pull/1163) — 修复 Amp 审批读取器的 `stripAnsi` 匹配 CSI 参数时**漏掉引入它们的 ESC**，而面板来自 `capture-pane -e`（保留 SGR）：颜色处残留一个裸 ESC，`^\s*` 锚定的行正则看不见它 → **四选一的审批只剩三个选项，且缺的正是被高亮的那一项**（设备按序号作答，走到的行与 Amp 画出来的那一行不是同一行）。同时 `cat log[0m].txt` 这类**路径/通配符是内容不是样式**，会被吃掉变成 `cat log].txt`。**最硬证据：引入该正则的同一个commit（#926）就修过 hermes 的同一缺陷**，`lib/askQuestion.ts` 的注释明写「真实捕获里边框前面有 SGR码」 |
 | [Langroid](https://github.com/langroid/langroid) | 4.1k | [#1218](https://github.com/langroid/langroid/pull/1218) — 修复读取表格数据时不剥离 UTF-8 BOM，首列名多出`\ufeff` 导致该列永远匹配不上 |
 | | | [#1219](https://github.com/langroid/langroid/pull/1219) — 修复爬虫遇到 301/302 时仍按请求 URL 解析相对链接，落在重定向后的页面上全部失效 |
 | | | [#1220](https://github.com/langroid/langroid/pull/1220) — 修复 Markdown 标题层级跳级（h2→h4）时被逐级下调，文档大纲层级失真 |
@@ -165,6 +166,21 @@ AI reviewer 的每一条意见都要回去读代码，不能凭直觉判定误�
   父应用用 `usage.prompt_tokens` 回读子应用的 `message_tokens` 再原样传下去，
   嵌套子应用每深一层，计数就再翻一次。
   1830 例差分模糊确认唯一变化就是这三个字段的归属。
+- **同一段清理逻辑的 N 份拷贝里，只有一份漏了锚点** — `stripAnsi` 在一个仓库里有 9 份拷贝，
+  6 份的转义匹配**连引入参数的那个 ESC 一起吃掉**，另外3 份没有：Amp 完全不匹配 ESC，
+  Kilo 把 ESC 写成可选 `ESC?`。面板来自 `capture-pane -e`（保留 SGR），于是被删掉的只是
+  `[38;5;244m` 这样的参数串，**颜色原处留下一个裸 ESC**，而下游 `^\s*` 锚定的行正则
+  和 `/^(\w+):$/` 工具名正则都看不穿它 → 高亮的那一行从选项列表里消失、四选一的审批
+  变成三选一（而设备按序号作答，走到的行与画出来的那行不是同一行），工具名也读不出来，
+  只剩一句通用的 `Approval required`。反方向同样成立：`cat log[0m].txt` 里的路径是**内容
+  不是样式**，被吃掉变成 `cat log].txt`。
+  判定它是遗漏的决定性证据：**引入这个正则的同一个 commit（#926）就修过 hermes 的同一处缺陷**，
+  `lib/askQuestion.ts` 里那段注释明写「真实捕获里边框前面有 SGR 码，所以 `^│` 从来没匹配上——
+  hermes 明明对话框就在屏幕上，却被读成没有对话框」。
+  而仓库 33 个真实捕获夹具里**有 23 个带 SGR**（`question-commandcode.txt` 一个就505 个序列），
+  **23 个全部与那6 份共识不一致**；唯独 amp 的夹具被裁成了纯文本，所以测试永远碰不到。
+  差分 155 例（33 个真实捕获 × 5 种 SGR 位置），以兄弟正则当oracle：
+  修复前149 例不一致，修复后 0 例，**纠正 149 例、回归 0 例**。
 - **大小写与参数归一化漏一处** — 模块自己有归一化 helper，HTTP header 路径都走了，
   data URI 路径却直接比较原始字符串；`data:image/PNG;base64,...` 被判为非图片，
   而异常又被 `autodetect_safely` 吞掉降级成纯文本 —— **模型收到 base64 文本而非图片，无报错**。
