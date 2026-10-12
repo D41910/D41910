@@ -63,7 +63,7 @@ AI reviewer 的每一条意见都要回去读代码，不能凭直觉判定误�
 ## 开源贡献
 
 向这些项目提交了修复真实缺陷的 PR，覆盖 31 个仓库、合计约**93 万 star** 的 Agent 基础设施，
-其中 **25 个已合并进主干**：
+其中 **28 个已合并进主干**：
 
 | 项目 | Stars | 我的 PR |
 |---|---|---|
@@ -108,7 +108,7 @@ AI reviewer 的每一条意见都要回去读代码，不能凭直觉判定误�
 | | | [#1220](https://github.com/langroid/langroid/pull/1220) — ✅ **已合并** · 修复 Markdown 标题层级跳级（h2→h4）时被逐级下调，文档大纲层级失真 |
 | | | [#1221](https://github.com/langroid/langroid/pull/1221) — ✅ **已合并** · 修复 Markdown 分块把 `overlap=0`（显式要求不重叠）当成未设置而回落到默认值 |
 | | | [#1222](https://github.com/langroid/langroid/pull/1222) — ❌ **已关闭（未合并）** · 修复模糊检索拼接上下文时按字符硬切，会把单词从中间截断，检索质量与可读性同时下降 |
-| | | [#1223](https://github.com/langroid/langroid/pull/1223) — 修复加载表格数据时丢掉重名列 |
+| | | [#1223](https://github.com/langroid/langroid/pull/1223) — ✅ **已合并** · 修复加载表格数据时丢掉重名列 |
 | | | [#1224](https://github.com/langroid/langroid/pull/1224) — 修复 Markdown 分块丢掉段落开头的正文 |
 | | | [#1225](https://github.com/langroid/langroid/pull/1225) — ✅ **已合并** · 修复按行读取文档时丢掉行内空白 |
 | | | [#1226](https://github.com/langroid/langroid/pull/1226) — ✅ **已合并** · 修复 PDF 分页切分点被重复计入相邻两页 |
@@ -118,7 +118,8 @@ AI reviewer 的每一条意见都要回去读代码，不能凭直觉判定误�
 | | | [#1230](https://github.com/langroid/langroid/pull/1230) — ✅ **已合并** · 修复缺文档后端时抛出的错误不可操作（看不出要装哪个依赖） |
 | | | [#1231](https://github.com/langroid/langroid/pull/1231) — ✅ **已合并** · 修复删除不存在的 Redis key 报错，而非按幂等 no-op 处理 |
 | | | [#1232](https://github.com/langroid/langroid/pull/1232) — ✅ **已合并** · 修复 Agent 输出抽取不匹配字面量类型 |
-| | | [#1238](https://github.com/langroid/langroid/pull/1238) — 修复 `Parser.truncate_tokens` 不接受特殊 token 字面量 |
+| | | [#1238](https://github.com/langroid/langroid/pull/1238) — ✅ **已合并** · 修复 `Parser.truncate_tokens` 不接受特殊 token 字面量
+| | | [#1241](https://github.com/langroid/langroid/pull/1241) — 修复 `PineconeDB.add_documents` 吞掉被 Pinecone 拒绝的 upsert：仅打日志后继续，被拒的文档静默丢失、调用方仍被告知写入成功（同一缺陷 LanceDB 已在 #1201 修掉） |
 | [Haystack](https://github.com/deepset-ai/haystack) | 23k | [#13206](https://github.com/deepset-ai/haystack/pull/13206) — 修复文档评估器不支持容器级 metadata，使「同一文档、不同容器」的评测结果无法区分 |
 | [AntOmniEvo](https://github.com/ant-research/AntOmniEvo) | 1.1k | [#20](https://github.com/ant-research/AntOmniEvo/pull/20) — 修复退化会话检测 `find_degenerate_ending` **只接进 Pi 一个后端**：它按 span 形态判断、本就与后端无关（模块自述 "shared across coding agent implementations"），而 `ClaudeCodeProposer` 直接返回未检查的 trajectory。网关过载时模型返回空 assistant 消息、CLI 内部重试后**exit 0**，result 事件仍是 `subtype=success`/`is_error=false`，于是 Phase 2 看不到 error、只看到工件目录变了 → **把半途而废的改动提升为候选**（正是已合并的 #5 想消除、#14 想阻止的那一幕） |
 | [FrontierAgent](https://github.com/ApodexAI/FrontierAgent) | 5.2k | [#66](https://github.com/ApodexAI/FrontierAgent/pull/66) — 修复 `bash` / `run_python_code` 的工具结果**第二道截断预算被硬编码**（4K / 5K），而第一道溢出门槛是可配置的 `TOOL_EXEC_RESULT_MAX_CHARS`（默认 8K，官方 A/B 文档实测取到 50000）：在**默认 8K 下** `run_python_code` 每一次溢出结果的「落盘路径 + 退出判定」就已被第二道截断抹掉；而调大该配置对 agent_team 毫无作用，因为多出来的额度会被原样砍回去。同仓库的 React 后处理器早已按「第二道必须跟随第一道」实现并写明理由（`_CONFIGURED_EXEC_TOOLS`），既有的 grep/glob 10K 条目注释与跨两个后处理器的参数化测试也都在论证这条不变量 —— 唯独这两个可配置的工具没跟上 |
