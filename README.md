@@ -62,8 +62,8 @@ AI reviewer 的每一条意见都要回去读代码，不能凭直觉判定误�
 
 ## 开源贡献
 
-向这些项目提交了修复真实缺陷的 PR，覆盖 27 个仓库、合计约**89 万 star** 的 Agent 基础设施，
-其中 **18 个已合并进主干**：
+向这些项目提交了修复真实缺陷的 PR，覆盖 31 个仓库、合计约**93 万 star** 的 Agent 基础设施，
+其中 **25 个已合并进主干**：
 
 | 项目 | Stars | 我的 PR |
 |---|---|---|
@@ -80,8 +80,8 @@ AI reviewer 的每一条意见都要回去读代码，不能凭直觉判定误�
 | | | [#7930](https://github.com/crewAIInc/crewAI/pull/7930) — 修复 Bedrock Converse 多模态内容未归并导致请求被拒 |
 | | | [#7932](https://github.com/crewAIInc/crewAI/pull/7932) — 修复 Anthropic / OpenAI Responses 多模态内容未归并导致请求被拒 |
 | [AgentScope](https://github.com/agentscope-ai/agentscope) | 33k | [#2945](https://github.com/agentscope-ai/agentscope/pull/2945) — 修复写权限被当作八进制解析 |
-| [DeepCode](https://github.com/HKUDS/DeepCode) | 17k | [#255](https://github.com/HKUDS/DeepCode/pull/255) — 修复破坏性命令筛查按字面 token 匹配程序名，`/bin/rm -rf /`、`/usr/bin/sudo reboot` 全部绕过 |
-| | | [#256](https://github.com/HKUDS/DeepCode/pull/256) — 修复 glob 把 `_SKIP_DIRS` 拿绝对路径分量去匹配：工作区路径里只要含 `build`/`dist`/`venv`/`node_modules`，全部文件被跳过、静默返回「No files matched.」，而共用同一常量的 grep 正常返回 |
+| [DeepCode](https://github.com/HKUDS/DeepCode) | 17k | [#255](https://github.com/HKUDS/DeepCode/pull/255) — ✅ **已合并** · 修复破坏性命令筛查按字面 token 匹配程序名，`/bin/rm -rf /`、`/usr/bin/sudo reboot` 全部绕过 |
+| | | [#256](https://github.com/HKUDS/DeepCode/pull/256) — ✅ **已合并** · 修复 glob 把 `_SKIP_DIRS` 拿绝对路径分量去匹配：工作区路径里只要含 `build`/`dist`/`venv`/`node_modules`，全部文件被跳过、静默返回「No files matched.」，而共用同一常量的 grep 正常返回 |
 | [WeKnora](https://github.com/Tencent/WeKnora) | 32k | [#3996](https://github.com/Tencent/WeKnora/pull/3996) — 修复用户搜索在 SQLite(Lite) 上因 ILIKE 硬失败且未转义 LIKE 通配符 |
 | [gpt-researcher](https://github.com/assafelovic/gpt-researcher) | 30k | [#2199](https://github.com/assafelovic/gpt-researcher/pull/2199) — 修复图片生成开关因配置属性大小写不匹配而永久失效（且零日志） |
 | | | [#2200](https://github.com/assafelovic/gpt-researcher/pull/2200) — 修复在线文档加载器在 `metadata` 缺 `source` 时把 url 写成 `None`（缺 `metadata` 属性则整批加载中止） |
@@ -94,10 +94,10 @@ AI reviewer 的每一条意见都要回去读代码，不能凭直觉判定误�
 | [mobile-mcp](https://github.com/mobile-next/mobile-mcp) | 8.8k | [#487](https://github.com/mobile-next/mobile-mcp/pull/487) — 修复滑动 `distance` 无下界，负值使三份Robot 实现全部反向滑动且仍报告成功 |
 | [PraisonAI](https://github.com/MervinPraison/PraisonAI) | 9k | [#5731](https://github.com/MervinPraison/PraisonAI/pull/5731) — ✅ **已合并** · 修复数组形式参数（如 `memory=["SQLITE"]`）未走预设名归一化而静默回落到默认后端 |
 | | | [#5732](https://github.com/MervinPraison/PraisonAI/pull/5732) — ✅ **已合并** · 修复 `memory=["redis://..."]` 缺少不支持 URL scheme 的守卫，静默落到本地文件后端（字符串形式会正常报错） |
-| [RubyLLM](https://github.com/crmne/ruby_llm) | 4.4k | [#1051](https://github.com/crmne/ruby_llm/pull/1051) — 修复 OpenAI 兼容 embedding 批结果从不读 `index`，乱序行按到达顺序配对、重复/负数/缺失位置全部被当成成功 |
-| | | [#1052](https://github.com/crmne/ruby_llm/pull/1052) — 修复 Mistral 批结果是五个 embedding 批方言里唯一既不校验也不按 `index` 排序的：乱序行把向量配给错误的输入，非法位置静默成功 |
+| [RubyLLM](https://github.com/crmne/ruby_llm) | 4.4k | [#1051](https://github.com/crmne/ruby_llm/pull/1051) — ✅ **已合并** · 修复 OpenAI 兼容 embedding 批结果从不读 `index`，乱序行按到达顺序配对、重复/负数/缺失位置全部被当成成功 |
+| | | [#1052](https://github.com/crmne/ruby_llm/pull/1052) — ✅ **已合并** · 修复 Mistral 批结果是五个 embedding 批方言里唯一既不校验也不按 `index` 排序的：乱序行把向量配给错误的输入，非法位置静默成功 |
 | [Langroid](https://github.com/langroid/langroid) | 4.1k | [#1215](https://github.com/langroid/langroid/pull/1215) — ✅ **已合并** · 修复流式响应的同步 / 异步孪生实现漂移：`finish_reason == "content_filter"` 的空响应转可见提示**只加在同步侧**（PR #660），异步侧没有→ 被内容过滤器拦截时返回空消息，`Task.run_async()` 判定为无响应并原样重发，进入 issue #658 报告的死循环 |
-| [GPUStack](https://github.com/gpustack/gpustack) | 5.8k | [#6391](https://github.com/gpustack/gpustack/pull/6391) — 修复缓存provider 目录的卡片 `icon` 未接入仓库已有的 `validate_icon` scheme 白名单（catalog / community backend 两个兄弟源都接了、各有一条测试点名）：`javascript:`、SVG `data:` URI、协议相对 URL 可被存库并由 `GET /v2/cache-providers` 原样下发给前端渲染 |
+| [GPUStack](https://github.com/gpustack/gpustack) | 5.8k | [#6391](https://github.com/gpustack/gpustack/pull/6391) — ✅ **已合并** · 修复缓存provider 目录的卡片 `icon` 未接入仓库已有的 `validate_icon` scheme 白名单（catalog / community backend 两个兄弟源都接了、各有一条测试点名）：`javascript:`、SVG `data:` URI、协议相对 URL 可被存库并由 `GET /v2/cache-providers` 原样下发给前端渲染 |
 | [EvalScope](https://github.com/modelscope/evalscope) | 3.5k | [#1832](https://github.com/modelscope/evalscope/pull/1832) — ✅ **已合并** · 修复英文多选题解析器不接受全角逗号，`ANSWER: A，C` 只取到第一个选项，多选答案被静默判错 |
 | | | [#1833](https://github.com/modelscope/evalscope/pull/1833) — ✅ **已合并** · 修复 markdown 链只给图片做本地路径绝对化、音频与视频两个分支没做：相对路径下发后无法与 base64 区分，`max_length`（`pretty_print` 默认 50）还会把真实路径截成不存在的字符串 |
 | [SkillHub](https://github.com/iflytek/skillhub) | 5.2k | [#940](https://github.com/iflytek/skillhub/pull/940) — 修复创建命名空间表单的前端正则仍是纯 ASCII，而服务端 `SlugValidator` 自 PR #196 起已接受 Unicode 字母/数字/符号：中文、日文、韩文、emoji 命名的 slug 被前端拦下、请求根本发不出去（1026 例差分中 833 例被误拦），且报错文案与官方发布指南矛盾 · ⏳ 待补 DCO 签名与 CLA |
@@ -110,7 +110,7 @@ AI reviewer 的每一条意见都要回去读代码，不能凭直觉判定误�
 | | | [#1222](https://github.com/langroid/langroid/pull/1222) — ❌ **已关闭（未合并）** · 修复模糊检索拼接上下文时按字符硬切，会把单词从中间截断，检索质量与可读性同时下降 |
 | | | [#1223](https://github.com/langroid/langroid/pull/1223) — 修复加载表格数据时丢掉重名列 |
 | | | [#1224](https://github.com/langroid/langroid/pull/1224) — 修复 Markdown 分块丢掉段落开头的正文 |
-| | | [#1225](https://github.com/langroid/langroid/pull/1225) — 修复按行读取文档时丢掉行内空白 |
+| | | [#1225](https://github.com/langroid/langroid/pull/1225) — ✅ **已合并** · 修复按行读取文档时丢掉行内空白 |
 | | | [#1226](https://github.com/langroid/langroid/pull/1226) — ✅ **已合并** · 修复 PDF 分页切分点被重复计入相邻两页 |
 | | | [#1227](https://github.com/langroid/langroid/pull/1227) — ✅ **已合并** · 修复显式配置的 embedding 组织参数被忽略 |
 | | | [#1228](https://github.com/langroid/langroid/pull/1228) — ✅ **已合并** · 修复 BPE 分块边界处丢字 |
@@ -124,7 +124,8 @@ AI reviewer 的每一条意见都要回去读代码，不能凭直觉判定误�
 | [FrontierAgent](https://github.com/ApodexAI/FrontierAgent) | 5.2k | [#66](https://github.com/ApodexAI/FrontierAgent/pull/66) — 修复 `bash` / `run_python_code` 的工具结果**第二道截断预算被硬编码**（4K / 5K），而第一道溢出门槛是可配置的 `TOOL_EXEC_RESULT_MAX_CHARS`（默认 8K，官方 A/B 文档实测取到 50000）：在**默认 8K 下** `run_python_code` 每一次溢出结果的「落盘路径 + 退出判定」就已被第二道截断抹掉；而调大该配置对 agent_team 毫无作用，因为多出来的额度会被原样砍回去。同仓库的 React 后处理器早已按「第二道必须跟随第一道」实现并写明理由（`_CONFIGURED_EXEC_TOOLS`），既有的 grep/glob 10K 条目注释与跨两个后处理器的参数化测试也都在论证这条不变量 —— 唯独这两个可配置的工具没跟上 |
 | [Agent Framework](https://github.com/microsoft/agent-framework) | — | [#9137](https://github.com/microsoft/agent-framework/pull/9137) — ❌ **被关闭** · 见下方「被拒绝的修复」 |
 | [DeerFlow](https://github.com/bytedance/deer-flow) | 84k | [#6694](https://github.com/bytedance/deer-flow/pull/6694) — 修复 You.com 搜索结果直接裸读 `data["results"]` 与 `sections[section]`：非对象顶层、非对象 `results`、非列表 section 会带着 `TypeError`/`AttributeError` 冲出工具边界，而不是返回该provider 家族既有的结构化格式错误（Brave #6550 / GroundRoute #6603 / Tavily #6645 都已这么做） |
-| | | [#6719](https://github.com/bytedance/deer-flow/pull/6719) — 修复 Sofya 的 `_response_results` 只实现了该家族「畸形载荷收容规则」三条里的两条：它会跳过非对象条目，但**非空列表里一个可用对象都没有时返回空列表**，于是 `web_search` / `web_fetch` 双双落到「No results found」——等于告诉模型这个查询本来就没匹配上，而不是暴露畸形响应。同名函数在 GroundRoute 里有第三条分支且注释写明理由；**#6603 的 commit message 更直接把 sofya 列为「已应用该规则」的成员之一** |
+| | | [#6719](https://github.com/bytedance/deer-flow/pull/6719) — ✅ **已合并** · 修复 Sofya 的 `_response_results` 只实现了该家族「畸形载荷收容规则」三条里的两条：它会跳过非对象条目，但**非空列表里一个可用对象都没有时返回空列表**，于是 `web_search` / `web_fetch` 双双落到「No results found」——等于告诉模型这个查询本来就没匹配上，而不是暴露畸形响应。同名函数在 GroundRoute 里有第三条分支且注释写明理由；**#6603 的 commit message 更直接把 sofya 列为「已应用该规则」的成员之一** |
+| | | [#6779](https://github.com/bytedance/deer-flow/pull/6779) — 修复 Serper 的 `_response_items` 同样缺第三条收容规则：`organic` / `images` 容器非空却全是标量、`None` 或嵌套列表时返回空列表，`web_search` 落到「No results found」、`image_search` 落到「No images found」。**该 helper 被 search 与 image_search 共用**（`tools.py:448` / `503`），一处守卫盖两个入口；**#6603 的 commit message 也把 serper 点名为「已应用」** |
 
 ### 被拒绝的修复
 
