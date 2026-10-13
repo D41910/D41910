@@ -70,6 +70,9 @@ AI reviewer 的每一条意见都要回去读代码，不能凭直觉判定误�
 | [Langflow](https://github.com/langflow-ai/langflow) | 156k | [#15632](https://github.com/langflow-ai/langflow/pull/15632) — 修复向量库按自定义 id 写入后删除静默命中 0 行 |
 | | | [#15648](https://github.com/langflow-ai/langflow/pull/15648) — 修复「MMR traversal」搜索类型因大小写不匹配静默降级为普通 traversal |
 | [browser-use](https://github.com/browser-use/browser-use) | 117k | [#6004](https://github.com/browser-use/browser-use/pull/6004) — 修复 DOM 提取时结尾换行产生零宽chunk |
+| [LobeHub](https://github.com/lobehub/lobehub) | 83k | [#20907](https://github.com/lobehub/lobehub/pull/20907) — 修复导入会话标题裸 `slice` 截断切断代理对（落库残留孤立高位代理） |
+| | | [#20908](https://github.com/lobehub/lobehub/pull/20908) — 修复 `imageUrlToBase64` 未校验 `response.ok`，把 404 页面当图片 base64 送进模型 |
+| | | [#20910](https://github.com/lobehub/lobehub/pull/20910) — 修复异构会话导入路径未做 NUL 消毒，致整批 INSERT 被 Postgres 22021 中止 |
 | [cline](https://github.com/cline/cline) | 70k | [#14803](https://github.com/cline/cline/pull/14803) — 修复 diff 生成时清空文件产生幻影行 |
 | [LiteLLM](https://github.com/BerriAI/litellm) | 60k | [#44365](https://github.com/BerriAI/litellm/pull/44365) — 修复嵌套 `metadata` JWT claim 不可达 |
 | | | [#44800](https://github.com/BerriAI/litellm/pull/44800) — ✅ **已合并** · 修复流式中途失败未触达 proxy 失败边界 |
