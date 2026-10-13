@@ -63,7 +63,7 @@ AI reviewer 的每一条意见都要回去读代码，不能凭直觉判定误�
 ## 开源贡献
 
 向这些项目提交了修复真实缺陷的 PR，覆盖 31 个仓库、合计约**93 万 star** 的 Agent 基础设施，
-其中 **29 个已合并进主干**：
+其中 **35 个已合并进主干**：
 
 | 项目 | Stars | 我的 PR |
 |---|---|---|
@@ -119,12 +119,13 @@ AI reviewer 的每一条意见都要回去读代码，不能凭直觉判定误�
 | | | [#1231](https://github.com/langroid/langroid/pull/1231) — ✅ **已合并** · 修复删除不存在的 Redis key 报错，而非按幂等 no-op 处理 |
 | | | [#1232](https://github.com/langroid/langroid/pull/1232) — ✅ **已合并** · 修复 Agent 输出抽取不匹配字面量类型 |
 | | | [#1238](https://github.com/langroid/langroid/pull/1238) — ✅ **已合并** · 修复 `Parser.truncate_tokens` 不接受特殊 token 字面量
-| | | [#1241](https://github.com/langroid/langroid/pull/1241) — 修复 `PineconeDB.add_documents` 吞掉被 Pinecone 拒绝的 upsert：仅打日志后继续，被拒的文档静默丢失、调用方仍被告知写入成功（同一缺陷 LanceDB 已在 #1201 修掉）
-| | | [#1242](https://github.com/langroid/langroid/pull/1242) — 修复 `RepoLoader.clone()` 克隆失败后仍返回目标路径（而非 `None`）：使 `load()` 里 `if path is None: raise ValueError("Unable to clone repo")` 成为死代码，克隆失败的仓库被当成空仓库加载 |
-| | | [#1243](https://github.com/langroid/langroid/pull/1243) — 修复异步流式解析不防 `choices: null` 的分块：`len(None)` 抛错被 `_stream_response_async` 的兜底 `except` 吞掉，流的其余部分被丢弃，调用方拿到空消息（同步孪生已防，异步侧漏了） |
-| | | [#1244](https://github.com/langroid/langroid/pull/1244) — 修复 `DocChatAgent.llm_response_async()` 对空查询返回 `None`（同步孪生返回 `NO_ANSWER` 文档），使 `Task.step_async()` 里针对 NO_ANSWER 的分支在异步路径上永不可达 |
-| | | [#1245](https://github.com/langroid/langroid/pull/1245) — 修复 `llm_response_async()` 缺同步侧的 `AnyTool is None` 守卫：所有可用工具都被排除出严格恢复时仍继续，重置 config 并发一次「没有 schema 的恢复指令」的 LLM 请求 |
-| | | [#1250](https://github.com/langroid/langroid/pull/1250) — 修复 `llm_response_async()` 的严格恢复重试走了**同步**的 `self.llm_response()`（逐字照抄同步孪生的递归调用）：异步路径上这次「工具调用没通过校验、按 AnyTool schema 重试」的请求是**在协程里发起的阻塞式同步 LLM 调用**，且完全不经过异步流式通路。证据：孪生 docstring 自述「除 `self.response()` 调用外应完全相同」，而同文件其余语句全都分派给异步变体；维护者自己的 PR #758（修 #750 的异步死循环）正是**同时给两个块**加 `self.tool_error = False`，说明他们一贯成对编辑。差分（同步孪生当 oracle，5 场景）：修复前 5/5 入口点违规、修复后 0/5，恢复提示词与结果逐字节不变 |
+| | | [#1241](https://github.com/langroid/langroid/pull/1241) — ✅ **已合并** · 修复 `PineconeDB.add_documents` 吞掉被 Pinecone 拒绝的 upsert：仅打日志后继续，被拒的文档静默丢失、调用方仍被告知写入成功（同一缺陷 LanceDB 已在 #1201 修掉）
+| | | [#1242](https://github.com/langroid/langroid/pull/1242) — ✅ **已合并** · 修复 `RepoLoader.clone()` 克隆失败后仍返回目标路径（而非 `None`）：使 `load()` 里 `if path is None: raise ValueError("Unable to clone repo")` 成为死代码，克隆失败的仓库被当成空仓库加载 |
+| | | [#1243](https://github.com/langroid/langroid/pull/1243) — ✅ **已合并** · 修复异步流式解析不防 `choices: null` 的分块：`len(None)` 抛错被 `_stream_response_async` 的兜底 `except` 吞掉，流的其余部分被丢弃，调用方拿到空消息（同步孪生已防，异步侧漏了） |
+| | | [#1244](https://github.com/langroid/langroid/pull/1244) — ✅ **已合并** · 修复 `DocChatAgent.llm_response_async()` 对空查询返回 `None`（同步孪生返回 `NO_ANSWER` 文档），使 `Task.step_async()` 里针对 NO_ANSWER 的分支在异步路径上永不可达 |
+| | | [#1245](https://github.com/langroid/langroid/pull/1245) — ✅ **已合并** · 修复 `llm_response_async()` 缺同步侧的 `AnyTool is None` 守卫：所有可用工具都被排除出严格恢复时仍继续，重置 config 并发一次「没有 schema 的恢复指令」的 LLM 请求 |
+| | | [#1250](https://github.com/langroid/langroid/pull/1250) — ✅ **已合并** · 修复 `llm_response_async()` 的严格恢复重试走了**同步**的 `self.llm_response()`（逐字照抄同步孪生的递归调用）：异步路径上这次「工具调用没通过校验、按 AnyTool schema 重试」的请求是**在协程里发起的阻塞式同步 LLM 调用**，且完全不经过异步流式通路。证据：孪生 docstring 自述「除 `self.response()` 调用外应完全相同」，而同文件其余语句全都分派给异步变体；维护者自己的 PR #758（修 #750 的异步死循环）正是**同时给两个块**加 `self.tool_error = False`，说明他们一贯成对编辑。差分（同步孪生当 oracle，5 场景）：修复前 5/5 入口点违规、修复后 0/5，恢复提示词与结果逐字节不变 |
+| | | [#1253](https://github.com/langroid/langroid/pull/1253) — 修复 `RelevanceExtractorAgent` 同步 / 异步孪生**拼给 LLM 的 prompt 漂移**：同步侧把段落包在 `<Instructions>` 块里（要求用 `extract_segments` 工具、返回指定 JSON），异步侧只发 PASSAGE + QUERY。而 `DocChatAgent` 的并发抽取链路走的正是异步孪生（`get_verbatim_extracts` → `run_batch_tasks` → `Task.run_async` → `llm_response_async`）→ 每个段落都没带抽取指令，工具调用全靠模型猜（方法 docstring 却写着「LLM 应当生成符合 SegmentExtractTool schema 的结构化消息」）。最强证据：commit `500fa889`（标题就是 "improve tool prompt"）把该指令块加进了 system_message、`handle_llm_no_tool` 配置和同步 prompt 四处，唯独漏了异步 prompt（那个 commit 里异步方法只改了 return 写法）。差分以同步孪生为 oracle：修复前两侧 prompt 不一致，修复后逐字节相同 |
 | [Haystack](https://github.com/deepset-ai/haystack) | 23k | [#13206](https://github.com/deepset-ai/haystack/pull/13206) — 修复文档评估器不支持容器级 metadata，使「同一文档、不同容器」的评测结果无法区分 |
 | [AntOmniEvo](https://github.com/ant-research/AntOmniEvo) | 1.1k | [#20](https://github.com/ant-research/AntOmniEvo/pull/20) — 修复退化会话检测 `find_degenerate_ending` **只接进 Pi 一个后端**：它按 span 形态判断、本就与后端无关（模块自述 "shared across coding agent implementations"），而 `ClaudeCodeProposer` 直接返回未检查的 trajectory。网关过载时模型返回空 assistant 消息、CLI 内部重试后**exit 0**，result 事件仍是 `subtype=success`/`is_error=false`，于是 Phase 2 看不到 error、只看到工件目录变了 → **把半途而废的改动提升为候选**（正是已合并的 #5 想消除、#14 想阻止的那一幕） |
 | [FrontierAgent](https://github.com/ApodexAI/FrontierAgent) | 5.2k | [#66](https://github.com/ApodexAI/FrontierAgent/pull/66) — ✅ **已合并** · 修复 `bash` / `run_python_code` 的工具结果**第二道截断预算被硬编码**（4K / 5K），而第一道溢出门槛是可配置的 `TOOL_EXEC_RESULT_MAX_CHARS`（默认 8K，官方 A/B 文档实测取到 50000）：在**默认 8K 下** `run_python_code` 每一次溢出结果的「落盘路径 + 退出判定」就已被第二道截断抹掉；而调大该配置对 agent_team 毫无作用，因为多出来的额度会被原样砍回去。同仓库的 React 后处理器早已按「第二道必须跟随第一道」实现并写明理由（`_CONFIGURED_EXEC_TOOLS`），既有的 grep/glob 10K 条目注释与跨两个后处理器的参数化测试也都在论证这条不变量 —— 唯独这两个可配置的工具没跟上 |
