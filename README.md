@@ -14,7 +14,7 @@
 
 ---
 
-| 项目 | Stars | 我的 PR |
+| Project | ★ | Merged PR |
 |---|---|---|
 | [dify](https://github.com/langgenius/dify) | 158.4k | [#44014](https://github.com/langgenius/dify/pull/44014) — fix(dify-agent): verify E2B binding Home as well as Workspace on acquire |
 | [deer-flow](https://github.com/bytedance/deer-flow) | 83.8k | [#6719](https://github.com/bytedance/deer-flow/pull/6719) — fix(sofya): report a format error for a results list with no usable objects |
