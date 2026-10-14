@@ -9,6 +9,26 @@ GitHub: [D41910](https://github.com/D41910) · 开源贡献主页：[github.com/
 
 ---
 
+## 📊 已合并 PR 汇总
+
+向 **9 个项目** 提交了 **36 个** 已合并修复，覆盖约 **28 万 star** 的 Agent / LLM 开源基础设施：
+
+| Project | ★ | Merged |
+|---|---|---|
+| [langgenius/dify](https://github.com/langgenius/dify) | 158k | 1 |
+| [bytedance/deer-flow](https://github.com/bytedance/deer-flow) | 83.8k | 1 |
+| [HKUDS/DeepCode](https://github.com/HKUDS/DeepCode) | 16.7k | 2 |
+| [gpustack/gpustack](https://github.com/gpustack/gpustack) | 5.8k | 1 |
+| [ApodexAI/FrontierAgent](https://github.com/ApodexAI/FrontierAgent) | 5.2k | 1 |
+| [crmne/ruby_llm](https://github.com/crmne/ruby_llm) | 4.4k | 2 |
+| [langroid/langroid](https://github.com/langroid/langroid) | 4.1k | 20 |
+| [modelscope/evalscope](https://github.com/modelscope/evalscope) | 3.5k | 2 |
+| [ant-research/AntOmniEvo](https://github.com/ant-research/AntOmniEvo) | 1.1k | 1 |
+
+> 详细 PR 列表、修复思路与验证过程见下方各条目。
+
+---
+
 ## ✅ 已被合并的修复
 
 **[PraisonAI#5731](https://github.com/MervinPraison/PraisonAI/pull/5731) — 修复数组形式参数未走预设名归一化，静默回落默认后端**
