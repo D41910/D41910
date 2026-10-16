@@ -1,9 +1,9 @@
-## ✅ 已合并 PR（48 个 / 14 个项目）
+## ✅ 已合并 PR（48 个 / 15 个项目）
 
 | Project | ★ | Merged |
 |---|---|---|
 | [langgenius/dify](https://github.com/langgenius/dify) | 158.6k | 8 |
-| [bytedance/deer-flow](https://github.com/bytedance/deer-flow) | 83.9k | 2 |
+| [bytedance/deer-flow](https://github.com/bytedance/deer-flow) | 83.9k | 3 |
 | [BerriAI/litellm](https://github.com/BerriAI/litellm) | 61.3k | 1 |
 | [labring/FastGPT](https://github.com/labring/FastGPT) | 29.8k | 1 |
 | [1Panel-dev/MaxKB](https://github.com/1Panel-dev/MaxKB) | 23.0k | 1 |
@@ -15,6 +15,7 @@
 | [crmne/ruby_llm](https://github.com/crmne/ruby_llm) | 4.5k | 2 |
 | [langroid/langroid](https://github.com/langroid/langroid) | 4.1k | 21 |
 | [modelscope/evalscope](https://github.com/modelscope/evalscope) | 3.5k | 2 |
+| [NVIDIA/NeMo-Agent-Toolkit](https://github.com/NVIDIA/NeMo-Agent-Toolkit) | 2.7k | 1 |
 | [ant-research/AntOmniEvo](https://github.com/ant-research/AntOmniEvo) | 1.1k | 1 |
 
 ---
@@ -29,7 +30,8 @@
 |  | [#44083](https://github.com/langgenius/dify/pull/44083) — fix(nodejs-client): preserve SSE field value whitespace |
 |  | [#44017](https://github.com/langgenius/dify/pull/44017) — fix(knowledge): only batch-enable segments whose indexing completed |
 |  | [#44014](https://github.com/langgenius/dify/pull/44014) — fix(dify-agent): verify E2B binding Home as well as Workspace on acquire |
-| [deer-flow](https://github.com/bytedance/deer-flow) | [#6779](https://github.com/bytedance/deer-flow/pull/6779) — fix(serper): report a format error for results with no usable objects |
+| [deer-flow](https://github.com/bytedance/deer-flow) | [#6966](https://github.com/bytedance/deer-flow/pull/6966) — refactor(community): fold serper onto the shared max_results |
+|  | [#6779](https://github.com/bytedance/deer-flow/pull/6779) — fix(serper): report a format error for results with no usable objects |
 |  | [#6719](https://github.com/bytedance/deer-flow/pull/6719) — fix(sofya): report a format error for a results list with no usable objects |
 | [litellm](https://github.com/BerriAI/litellm) | [#44800](https://github.com/BerriAI/litellm/pull/44800) — fix(anthropic): let /v1/messages mid-stream failures reach the proxy failure boundary |
 | [FastGPT](https://github.com/labring/FastGPT) | [#7924](https://github.com/labring/FastGPT/pull/7924) — fix(workflow): 判断器「包含/不包含」对非字符串值恒返回 false |
@@ -66,4 +68,5 @@
 |  | [#1215](https://github.com/langroid/langroid/pull/1215) — fix(llm): handle content-filtered chunks in the async stream path |
 | [evalscope](https://github.com/modelscope/evalscope) | [#1833](https://github.com/modelscope/evalscope/pull/1833) — fix(messages): absolutise local audio and video paths in markdown output |
 |  | [#1832](https://github.com/modelscope/evalscope/pull/1832) — fix(multi-choice): accept a full-width comma between unbracketed answer labels |
+| [NeMo-Agent-Toolkit](https://github.com/NVIDIA/NeMo-Agent-Toolkit) | [#2345](https://github.com/NVIDIA/NeMo-Agent-Toolkit/pull/2345) — fix(observability): resolve the OpenInference span kind from attribute context |
 | [AntOmniEvo](https://github.com/ant-research/AntOmniEvo) | [#20](https://github.com/ant-research/AntOmniEvo/pull/20) — fix(proposer): detect degenerate Claude Code sessions before rollout |
