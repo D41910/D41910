@@ -74,3 +74,12 @@
 |  | [#1832](https://github.com/modelscope/evalscope/pull/1832) — fix(multi-choice): accept a full-width comma between unbracketed answer labels |
 | [NeMo-Agent-Toolkit](https://github.com/NVIDIA/NeMo-Agent-Toolkit) | [#2345](https://github.com/NVIDIA/NeMo-Agent-Toolkit/pull/2345) — fix(observability): resolve the OpenInference span kind from attribute context |
 | [AntOmniEvo](https://github.com/ant-research/AntOmniEvo) | [#20](https://github.com/ant-research/AntOmniEvo/pull/20) — fix(proposer): detect degenerate Claude Code sessions before rollout |
+
+---
+
+## 🤝 Co-authored 合入主干（维护者采纳重写，署名 co-author）
+
+| Project | ★ | Commit |
+|---|---|---|
+| [openclaw/openclaw](https://github.com/openclaw/openclaw) | 392.0k | [`4513e9e`](https://github.com/openclaw/openclaw/commit/4513e9e09633a740f58b4ccf8802597968868c47) — fix(sessions): record failed post-commit transcript publication instead of dropping it（源自 PR [#173387](https://github.com/openclaw/openclaw/pull/173387)） |
+| [openclaw/openclaw](https://github.com/openclaw/openclaw) |  | [`ef97167`](https://github.com/openclaw/openclaw/commit/ef97167c3723c2bab32e7c703a9db99894946138) — fix(cron): record refused failure-alert delivery so fallback runs（源自 PR [#173163](https://github.com/openclaw/openclaw/pull/173163)） |
