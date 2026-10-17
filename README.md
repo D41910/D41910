@@ -1,7 +1,8 @@
-## ✅ 已合并 PR（50 个 / 17 个项目）
+## ✅ 已合并 PR（52 个 / 18 个项目）
 
 | Project | ★ | Merged |
 |---|---|---|
+| [openclaw/openclaw](https://github.com/openclaw/openclaw) | 392.0k | 2 |
 | [langgenius/dify](https://github.com/langgenius/dify) | 158.6k | 8 |
 | [bytedance/deer-flow](https://github.com/bytedance/deer-flow) | 83.9k | 3 |
 | [BerriAI/litellm](https://github.com/BerriAI/litellm) | 61.3k | 1 |
@@ -24,6 +25,8 @@
 
 | Project | Merged PR |
 |---|---|
+| [openclaw](https://github.com/openclaw/openclaw) | [#173387](https://github.com/openclaw/openclaw/pull/173387) — fix(agents): contain failures publishing saved transcript updates |
+|  | [#173163](https://github.com/openclaw/openclaw/pull/173163) — fix(cron): preserve failure alerts refused before delivery |
 | [dify](https://github.com/langgenius/dify) | [#44120](https://github.com/langgenius/dify/pull/44120) — fix(nodejs-client): replace stale user fields in native upload forms |
 |  | [#44097](https://github.com/langgenius/dify/pull/44097) — fix(nodejs-client): allow empty keyword filters in list APIs |
 |  | [#44090](https://github.com/langgenius/dify/pull/44090) — fix(nodejs-client): override default headers case-insensitively |
@@ -74,12 +77,3 @@
 |  | [#1832](https://github.com/modelscope/evalscope/pull/1832) — fix(multi-choice): accept a full-width comma between unbracketed answer labels |
 | [NeMo-Agent-Toolkit](https://github.com/NVIDIA/NeMo-Agent-Toolkit) | [#2345](https://github.com/NVIDIA/NeMo-Agent-Toolkit/pull/2345) — fix(observability): resolve the OpenInference span kind from attribute context |
 | [AntOmniEvo](https://github.com/ant-research/AntOmniEvo) | [#20](https://github.com/ant-research/AntOmniEvo/pull/20) — fix(proposer): detect degenerate Claude Code sessions before rollout |
-
----
-
-## 🤝 Co-authored 合入主干（维护者采纳重写，署名 co-author）
-
-| Project | ★ | Commit |
-|---|---|---|
-| [openclaw/openclaw](https://github.com/openclaw/openclaw) | 392.0k | [`4513e9e`](https://github.com/openclaw/openclaw/commit/4513e9e09633a740f58b4ccf8802597968868c47) — fix(sessions): record failed post-commit transcript publication instead of dropping it（源自 PR [#173387](https://github.com/openclaw/openclaw/pull/173387)） |
-| [openclaw/openclaw](https://github.com/openclaw/openclaw) |  | [`ef97167`](https://github.com/openclaw/openclaw/commit/ef97167c3723c2bab32e7c703a9db99894946138) — fix(cron): record refused failure-alert delivery so fallback runs（源自 PR [#173163](https://github.com/openclaw/openclaw/pull/173163)） |
