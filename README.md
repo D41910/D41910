@@ -25,8 +25,8 @@
 
 | Project | Merged PR |
 |---|---|
-| [openclaw](https://github.com/openclaw/openclaw) | [#173387](https://github.com/openclaw/openclaw/pull/173387) — fix(agents): contain failures publishing saved transcript updates |
-|  | [#173163](https://github.com/openclaw/openclaw/pull/173163) — fix(cron): preserve failure alerts refused before delivery |
+| [openclaw](https://github.com/openclaw/openclaw) | [#173387](https://github.com/openclaw/openclaw/pull/173387) — fix(agents): contain failures publishing saved transcript updates<br>↳ 修复被维护者采纳，重写后合入主干 [#174947](https://github.com/openclaw/openclaw/pull/174947)，commit [`4513e9e`](https://github.com/openclaw/openclaw/commit/4513e9e09633a740f58b4ccf8802597968868c47) 署名我 co-author |
+|  | [#173163](https://github.com/openclaw/openclaw/pull/173163) — fix(cron): preserve failure alerts refused before delivery<br>↳ 修复被维护者采纳，重写后合入主干 [#173347](https://github.com/openclaw/openclaw/pull/173347)，commit [`ef97167`](https://github.com/openclaw/openclaw/commit/ef97167c3723c2bab32e7c703a9db99894946138) 署名我 co-author |
 | [dify](https://github.com/langgenius/dify) | [#44120](https://github.com/langgenius/dify/pull/44120) — fix(nodejs-client): replace stale user fields in native upload forms |
 |  | [#44097](https://github.com/langgenius/dify/pull/44097) — fix(nodejs-client): allow empty keyword filters in list APIs |
 |  | [#44090](https://github.com/langgenius/dify/pull/44090) — fix(nodejs-client): override default headers case-insensitively |
