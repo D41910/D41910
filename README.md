@@ -1,4 +1,4 @@
-## ✅ 已合并 PR（48 个 / 15 个项目）
+## ✅ 已合并 PR（50 个 / 17 个项目）
 
 | Project | ★ | Merged |
 |---|---|---|
@@ -6,6 +6,8 @@
 | [bytedance/deer-flow](https://github.com/bytedance/deer-flow) | 83.9k | 3 |
 | [BerriAI/litellm](https://github.com/BerriAI/litellm) | 61.3k | 1 |
 | [labring/FastGPT](https://github.com/labring/FastGPT) | 29.8k | 1 |
+| [microsoft/semantic-kernel](https://github.com/microsoft/semantic-kernel) | 28.7k | 1 |
+| [deepset-ai/haystack](https://github.com/deepset-ai/haystack) | 26.8k | 1 |
 | [1Panel-dev/MaxKB](https://github.com/1Panel-dev/MaxKB) | 23.0k | 1 |
 | [HKUDS/DeepCode](https://github.com/HKUDS/DeepCode) | 16.7k | 2 |
 | [neuml/txtai](https://github.com/neuml/txtai) | 13.0k | 1 |
@@ -35,6 +37,8 @@
 |  | [#6719](https://github.com/bytedance/deer-flow/pull/6719) — fix(sofya): report a format error for a results list with no usable objects |
 | [litellm](https://github.com/BerriAI/litellm) | [#44800](https://github.com/BerriAI/litellm/pull/44800) — fix(anthropic): let /v1/messages mid-stream failures reach the proxy failure boundary |
 | [FastGPT](https://github.com/labring/FastGPT) | [#7924](https://github.com/labring/FastGPT/pull/7924) — fix(workflow): 判断器「包含/不包含」对非字符串值恒返回 false |
+| [semantic-kernel](https://github.com/microsoft/semantic-kernel) | [#14563](https://github.com/microsoft/semantic-kernel/pull/14563) — fix(python): reject dot-segment remote paths in SessionsPythonTool.upload_file |
+| [haystack](https://github.com/deepset-ai/haystack) | [#13206](https://github.com/deepset-ai/haystack/pull/13206) — fix: support container metadata in document evaluators |
 | [MaxKB](https://github.com/1Panel-dev/MaxKB) | [#7311](https://github.com/1Panel-dev/MaxKB/pull/7311) — fix: split at full-width exclamation/question marks in smart_split_paragraph |
 | [DeepCode](https://github.com/HKUDS/DeepCode) | [#256](https://github.com/HKUDS/DeepCode/pull/256) — fix(tools): prune _SKIP_DIRS below the glob base, not the whole path |
 |  | [#255](https://github.com/HKUDS/DeepCode/pull/255) — fix(security): normalize the program path in the destructive-command screen |
